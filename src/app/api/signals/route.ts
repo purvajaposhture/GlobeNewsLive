@@ -104,6 +104,7 @@ export async function GET(request: Request) {
   const filter = searchParams.get('filter');
   const refresh = searchParams.get('refresh') === 'true';
   const category = searchParams.get('category');
+  const origin = new URL(request.url).origin;
   
   try {
     // Return cached data if fresh (unless refresh requested)
@@ -127,9 +128,14 @@ export async function GET(request: Request) {
       const timeoutId = setTimeout(() => controller.abort(), timeout);
       try {
         // Handle URL that might be an object (for multi-language feeds)
-        let fetchUrl = url;
+        let fetchUrl: string = url;
         if (typeof url === 'object') {
-          fetchUrl = (url as Record<string, string>)['en'] || Object.values(url)[0];
+          fetchUrl = (url as Record<string, string>)['en'] || Object.values(url as Record<string, string>)[0];
+        }
+        
+        // Convert relative internal URLs to absolute
+        if (fetchUrl.startsWith('/')) {
+          fetchUrl = `${origin}${fetchUrl}`;
         }
         
         const res = await fetch(fetchUrl, { 
