@@ -74,9 +74,9 @@ function SignalItem({ signal, onClick, isNew }: { signal: Signal & { iranRelevan
   
   return (
     <div 
-      className={`flex gap-2 py-2 px-1 border-b border-border-subtle hover:bg-white/[0.02] cursor-pointer transition-all duration-300 ${
-        isNew ? 'animate-slide-in bg-white/[0.03]' : ''
-      } ${isIranRelated ? 'bg-orange-500/5' : ''}`}
+      className={`flex gap-2 py-2 px-1 border-b border-border-subtle hover:bg-text-primary/[0.02] cursor-pointer transition-all duration-300 ${
+        isNew ? 'animate-slide-in bg-text-primary/[0.03]' : ''
+      } ${isIranRelated ? 'bg-accent-amber/5' : ''}`}
       onClick={onClick}
       style={isNew ? { borderLeft: `3px solid ${color}` } : {}}
     >
@@ -89,12 +89,12 @@ function SignalItem({ signal, onClick, isNew }: { signal: Signal & { iranRelevan
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-start gap-2">
-          <div className="text-[11px] text-white/90 leading-tight mb-1.5 flex-1">
+          <div className="text-[11px] text-text-primary/90 leading-tight mb-1.5 flex-1">
             {signal.title}
           </div>
           <div className="flex items-center gap-1 flex-shrink-0">
             {isIranRelated && (
-              <span className="px-1 py-0.5 bg-orange-500/20 text-orange-400 text-[7px] font-mono font-bold rounded">
+              <span className="px-1 py-0.5 bg-accent-amber/20 text-accent-amber text-[7px] font-mono font-bold rounded">
                 🇮🇷
               </span>
             )}
@@ -282,7 +282,7 @@ export default function SignalFeed({ signals, loading, onSignalClick }: SignalFe
         </div>
         <div className="flex items-center gap-2">
           {iranCount > 0 && (
-            <span className="px-1.5 py-0.5 bg-orange-500/20 text-orange-400 text-[9px] font-mono font-bold rounded">
+            <span className="px-1.5 py-0.5 bg-accent-amber/20 text-accent-amber text-[9px] font-mono font-bold rounded">
               🇮🇷 {iranCount}
             </span>
           )}
@@ -292,14 +292,14 @@ export default function SignalFeed({ signals, loading, onSignalClick }: SignalFe
             </span>
           )}
           {loading && (
-            <span className="text-accent-gold text-[10px] animate-pulse">⟳</span>
+            <span className="text-accent-amber text-[10px] animate-pulse">⟳</span>
           )}
           <button
             onClick={() => setAutoScrollEnabled(v => !v)}
             className={`px-1.5 py-0.5 rounded text-[8px] font-mono font-bold tracking-wider transition-all ${
               autoScrollEnabled
                 ? 'bg-accent-green/20 text-accent-green'
-                : 'bg-white/5 text-text-dim hover:text-white'
+                : 'bg-text-primary/5 text-text-dim hover:text-text-primary'
             }`}
             title={autoScrollEnabled ? 'Auto-scroll on' : 'Auto-scroll off'}
           >
@@ -314,8 +314,8 @@ export default function SignalFeed({ signals, loading, onSignalClick }: SignalFe
           onClick={() => setFilter('all')}
           className={`px-2 py-1 rounded text-[9px] font-mono transition-all ${
             filter === 'all' 
-              ? 'bg-white/10 text-white' 
-              : 'text-text-dim hover:text-white hover:bg-white/5'
+              ? 'bg-text-primary/10 text-text-primary' 
+              : 'text-text-dim hover:text-text-primary hover:bg-text-primary/5'
           }`}
         >
           ALL ({signals.length})
@@ -324,8 +324,8 @@ export default function SignalFeed({ signals, loading, onSignalClick }: SignalFe
           onClick={() => setFilter('iran')}
           className={`px-2 py-1 rounded text-[9px] font-mono transition-all ${
             filter === 'iran' 
-              ? 'bg-orange-500/20 text-orange-400' 
-              : 'text-text-dim hover:text-orange-400 hover:bg-orange-500/10'
+              ? 'bg-accent-amber/20 text-accent-amber' 
+              : 'text-text-dim hover:text-accent-amber hover:bg-accent-amber/10'
           }`}
         >
           🇮🇷 IRAN ({iranCount})

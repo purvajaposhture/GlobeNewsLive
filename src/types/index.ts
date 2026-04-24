@@ -134,3 +134,26 @@ export type Language =
 export interface Translation {
   [key: string]: string | Translation;
 }
+
+export type MissileEventType = 'ICBM' | 'MRBM' | 'SRBM' | 'CRUISE' | 'DRONE' | 'AIRSTRIKE' | 'ARTILLERY' | 'INTERCEPTION';
+
+export type MissileEventStatus = 'active' | 'intercepted' | 'impact';
+
+export type MissileEventSource = 'ACLED' | 'GDELT' | 'FIRMS' | 'SYNTHETIC';
+
+export interface MissileEvent {
+  id: string;
+  type: MissileEventType;
+  origin: [number, number];
+  target: [number, number];
+  label: string;
+  speed: number;
+  altitude: number;
+  warhead: string;
+  status: MissileEventStatus;
+  confidence: number;
+  source: MissileEventSource;
+  timestamp: string;
+  region: string;
+  fatalities: number;
+}

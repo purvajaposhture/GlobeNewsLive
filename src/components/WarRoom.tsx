@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Signal } from '@/types';
 import { ACTIVE_CONFLICTS } from '@/lib/feeds';
-import Globe from '@/components/ui/globe';
+import Globe3D, { Globe3DRef } from './Globe3D';
+import GlobeToolbar, { useGlobeControls } from './GlobeToolbar';
+import ContinentSelector, { animateCameraTo } from './ContinentSelector';
 
 interface ConflictEvent {
   id: string;
@@ -148,9 +150,9 @@ function generateMockAlerts(): AlertEvent[] {
 function getStatusColor(status: string) {
   switch (status) {
     case 'active': return 'bg-accent-red';
-    case 'intercepted': return 'bg-green-500';
+    case 'intercepted': return 'bg-accent-green';
     case 'landed': return 'bg-gray-500';
-    default: return 'bg-accent-orange';
+    default: return 'bg-accent-amber';
   }
 }
 
@@ -166,30 +168,23 @@ function getStatusText(status: string) {
 function getSeverityColor(sev: string) {
   switch (sev) {
     case 'CRITICAL': return 'text-accent-red border-accent-red/40 bg-accent-red/10';
-    case 'HIGH': return 'text-accent-orange border-accent-orange/40 bg-accent-orange/10';
+    case 'HIGH': return 'text-accent-amber border-accent-amber/40 bg-accent-amber/10';
     case 'MEDIUM': return 'text-yellow-400 border-yellow-400/40 bg-yellow-400/10';
-    default: return 'text-text-dim border-border-subtle bg-elevated/50';
+    default: return 'text-text-dim border-border-dim bg-bg-elevated/50';
   }
 }
 
 export default function WarRoom({ signals, conflicts = [] }: WarRoomProps) {
   const [activeTheater, setActiveTheater] = useState('global');
   const [time, setTime] = useState(new Date());
-  const [missiles, setMissiles] = useState<MissileEvent[]>(generateMockMissiles());
-  const [alerts, setAlerts] = useState<AlertEvent[]>(generateMockAlerts());
+  const [missiles] = useState<MissileEvent[]>(generateMockMissiles());
+  const [alerts] = useState<AlertEvent[]>(generateMockAlerts());
+  const cameraRef = useRef<Globe3DRef>(null);
+  const { gridVisible, wireframe, toggleGrid, toggleMedia } = useGlobeControls();
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
-  }, []);
-
-  // Rotate mock data every 30s
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setMissiles(generateMockMissiles());
-      setAlerts(generateMockAlerts());
-    }, 30000);
-    return () => clearInterval(interval);
   }, []);
 
   const utcTime = time.toISOString().substring(11, 19);
@@ -199,9 +194,9 @@ export default function WarRoom({ signals, conflicts = [] }: WarRoomProps) {
   const interceptedCount = missiles.filter(m => m.status === 'intercepted').length;
 
   return (
-    <div className="h-full flex flex-col bg-void">
+    <div className="h-full flex flex-col bg-bg-void">
       {/* War Room Header */}
-      <div className="bg-elevated/80 border-b border-accent-red/30 px-4 py-2">
+      <div className="bg-bg-elevated/80 border-b border-accent-red/30 px-4 py-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-accent-red/20 flex items-center justify-center border border-accent-red/40">
@@ -225,7 +220,7 @@ export default function WarRoom({ signals, conflicts = [] }: WarRoomProps) {
                 className={`px-3 py-1.5 rounded text-[9px] font-mono transition-all ${
                   activeTheater === t.id
                     ? 'bg-accent-red/20 text-accent-red border border-accent-red/40'
-                    : 'text-text-dim hover:text-white hover:bg-white/5'
+                    : 'text-text-dim hover:text-text-primary hover:bg-text-primary/5'
                 }`}
               >
                 {t.icon} {t.name}
@@ -235,7 +230,7 @@ export default function WarRoom({ signals, conflicts = [] }: WarRoomProps) {
 
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <div className="font-mono text-lg text-white">{utcTime}</div>
+              <div className="font-mono text-lg text-text-primary">{utcTime}</div>
               <div className="font-mono text-[9px] text-text-muted">{utcDate} UTC</div>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 bg-accent-red/10 rounded border border-accent-red/30">
@@ -249,10 +244,10 @@ export default function WarRoom({ signals, conflicts = [] }: WarRoomProps) {
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Active Missiles + Alert Feed */}
-        <aside className="w-[320px] border-r border-border-default overflow-hidden flex flex-col">
+        <aside className="w-[320px] border-r border-border-dim overflow-hidden flex flex-col">
           {/* Active Missiles */}
           <div className="flex-1 flex flex-col min-h-0">
-            <div className="px-3 py-2 border-b border-border-subtle bg-panel/50 flex items-center justify-between">
+            <div className="px-3 py-2 border-b border-border-dim bg-bg-panel/50 flex items-center justify-between">
               <span className="font-mono text-[10px] font-bold text-accent-red">
                 🚀 ACTIVE MISSILES
               </span>
@@ -260,13 +255,13 @@ export default function WarRoom({ signals, conflicts = [] }: WarRoomProps) {
             </div>
             <div className="flex-1 overflow-y-auto">
               {missiles.map(m => (
-                <div key={m.id} className="px-3 py-2 border-b border-border-subtle hover:bg-white/[0.02]">
+                <div key={m.id} className="px-3 py-2 border-b border-border-dim hover:bg-text-primary/[0.02]">
                   <div className="flex items-start gap-2">
                     <div className={`w-2 h-2 rounded-full mt-1 ${getStatusColor(m.status)} ${m.status === 'active' ? 'animate-pulse' : ''}`} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono text-white">{m.type}</span>
-                        <span className={`text-[8px] font-mono px-1 py-0.5 rounded ${m.status === 'active' ? 'bg-accent-red/20 text-accent-red' : m.status === 'intercepted' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                        <span className="text-[10px] font-mono text-text-primary">{m.type}</span>
+                        <span className={`text-[8px] font-mono px-1 py-0.5 rounded ${m.status === 'active' ? 'bg-accent-red/20 text-accent-red' : m.status === 'intercepted' ? 'bg-accent-green/20 text-accent-green' : 'bg-gray-500/20 text-gray-400'}`}>
                           {getStatusText(m.status)}
                         </span>
                       </div>
@@ -286,22 +281,22 @@ export default function WarRoom({ signals, conflicts = [] }: WarRoomProps) {
           </div>
 
           {/* Alert Feed */}
-          <div className="flex-1 flex flex-col min-h-0 border-t border-border-default">
-            <div className="px-3 py-2 border-b border-border-subtle bg-panel/50 flex items-center justify-between">
-              <span className="font-mono text-[10px] font-bold text-accent-orange">
+          <div className="flex-1 flex flex-col min-h-0 border-t border-border-dim">
+            <div className="px-3 py-2 border-b border-border-dim bg-bg-panel/50 flex items-center justify-between">
+              <span className="font-mono text-[10px] font-bold text-accent-amber">
                 ⚠️ ALERT FEED
               </span>
               <span className="text-[9px] text-text-dim">{alerts.length} ALERTS</span>
             </div>
             <div className="flex-1 overflow-y-auto">
               {alerts.map(a => (
-                <div key={a.id} className="px-3 py-2 border-b border-border-subtle hover:bg-white/[0.02]">
+                <div key={a.id} className="px-3 py-2 border-b border-border-dim hover:bg-text-primary/[0.02]">
                   <div className="flex items-start gap-2">
                     <div className={`text-[8px] font-mono px-1 py-0.5 rounded border ${getSeverityColor(a.severity)}`}>
                       {a.severity}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-[10px] text-white leading-tight">{a.title}</div>
+                      <div className="text-[10px] text-text-primary leading-tight">{a.title}</div>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-[8px] text-text-dim">{a.region}</span>
                         <span className="text-[8px] text-text-dim">{a.category}</span>
@@ -315,45 +310,67 @@ export default function WarRoom({ signals, conflicts = [] }: WarRoomProps) {
           </div>
         </aside>
 
-        {/* Center - War Room Map */}
+        {/* Center - Globe */}
         <section className="flex-1 overflow-hidden relative">
           {/* Map Toolbar */}
           <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
-            <div className="bg-black/70 backdrop-blur rounded border border-white/10 px-2 py-1">
-              <span className="text-[10px] font-mono text-white/70">🌍 World Monitor</span>
+            <ContinentSelector
+              onSelect={(target) => {
+                const cam = cameraRef.current?.getCamera();
+                if (cam && 'position' in cam) {
+                  animateCameraTo(cam as any, target);
+                }
+              }}
+            />
+            <div className="bg-bg-panel/70 backdrop-blur rounded border border-border-dim px-2 py-1">
+              <span className="text-[10px] font-mono text-text-muted">🌍 World Monitor</span>
             </div>
           </div>
 
           {/* Time filters */}
-          <div className="absolute top-3 right-3 z-10 flex items-center gap-1">
+          <div className="absolute top-3 right-14 z-10 flex items-center gap-1">
             {['1h', '6h', '24h', '48h', '7d', 'All'].map(t => (
               <button
                 key={t}
-                className="px-2 py-1 text-[9px] font-mono bg-black/70 backdrop-blur rounded border border-white/10 text-text-dim hover:text-white hover:bg-white/5 transition-all"
+                className="px-2 py-1 text-[9px] font-mono bg-bg-panel/70 backdrop-blur rounded border border-border-dim text-text-dim hover:text-text-primary hover:bg-text-primary/5 transition-all"
               >
                 {t}
               </button>
             ))}
           </div>
 
-          <Globe />
+          <Globe3D
+            view={activeTheater}
+            gridVisible={gridVisible}
+            wireframe={wireframe}
+            cameraRef={cameraRef}
+          />
+
+          <GlobeToolbar
+            onZoomIn={() => cameraRef.current?.zoomIn()}
+            onZoomOut={() => cameraRef.current?.zoomOut()}
+            onToggleGrid={toggleGrid}
+            onToggleMedia={toggleMedia}
+            gridActive={gridVisible}
+            mediaActive={wireframe}
+          />
         </section>
 
         {/* Right Panel - Hotspots + Stats + Signals */}
-        <aside className="w-[280px] border-l border-border-default overflow-y-auto p-2 space-y-2">
+        <aside className="w-[280px] border-l border-border-dim overflow-y-auto p-2 space-y-2">
           {/* Active Hotspots */}
           <div className="glass-panel">
-            <div className="px-3 py-2 border-b border-border-subtle bg-panel/50">
+            <div className="px-3 py-2 border-b border-border-dim bg-bg-panel/50">
               <span className="font-mono text-[10px] font-bold text-accent-red">🔥 ACTIVE HOTSPOTS</span>
             </div>
             <div className="p-2 space-y-1">
               {ACTIVE_CONFLICTS.map(c => (
-                <div key={c.name} className="flex items-center justify-between px-2 py-1.5 bg-elevated/50 rounded">
+                <div key={c.name} className="flex items-center justify-between px-2 py-1.5 bg-bg-elevated/50 rounded">
                   <div className="flex items-center gap-2">
-                    <div className={`w-1.5 h-1.5 rounded-full ${c.intensity === 'high' ? 'bg-accent-red animate-pulse' : 'bg-accent-orange'}`} />
-                    <span className="text-[10px] text-white">{c.name}</span>
+                    <div className={`w-1.5 h-1.5 rounded-full ${c.intensity === 'high' ? 'bg-accent-red animate-pulse' : 'bg-accent-amber'}`} />
+                    <span className="text-[10px] text-text-primary">{c.name}</span>
                   </div>
-                  <span className={`text-[8px] font-mono px-1.5 py-0.5 rounded ${c.intensity === 'high' ? 'bg-accent-red/20 text-accent-red' : 'bg-accent-orange/20 text-accent-orange'}`}>
+                  <span className={`text-[8px] font-mono px-1.5 py-0.5 rounded ${c.intensity === 'high' ? 'bg-accent-red/20 text-accent-red' : 'bg-accent-amber/20 text-accent-amber'}`}>
                     {c.intensity.toUpperCase()}
                   </span>
                 </div>
@@ -363,8 +380,8 @@ export default function WarRoom({ signals, conflicts = [] }: WarRoomProps) {
 
           {/* Conflict Stats */}
           <div className="glass-panel">
-            <div className="px-3 py-2 border-b border-border-subtle bg-panel/50">
-              <span className="font-mono text-[10px] font-bold text-white">📊 CONFLICT STATS</span>
+            <div className="px-3 py-2 border-b border-border-dim bg-bg-panel/50">
+              <span className="font-mono text-[10px] font-bold text-text-primary">📊 CONFLICT STATS</span>
             </div>
             <div className="p-3 space-y-3">
               <div className="flex justify-between">
@@ -373,7 +390,7 @@ export default function WarRoom({ signals, conflicts = [] }: WarRoomProps) {
               </div>
               <div className="flex justify-between">
                 <span className="text-[10px] text-text-muted">Insurgencies</span>
-                <span className="text-[12px] font-mono text-accent-orange font-bold">{ACTIVE_CONFLICTS.filter(c => c.type === 'insurgency').length}</span>
+                <span className="text-[12px] font-mono text-accent-amber font-bold">{ACTIVE_CONFLICTS.filter(c => c.type === 'insurgency').length}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[10px] text-text-muted">High Intensity</span>
@@ -381,20 +398,20 @@ export default function WarRoom({ signals, conflicts = [] }: WarRoomProps) {
               </div>
               <div className="flex justify-between">
                 <span className="text-[10px] text-text-muted">Today's Events</span>
-                <span className="text-[12px] font-mono text-white font-bold">{conflicts.length}</span>
+                <span className="text-[12px] font-mono text-text-primary font-bold">{conflicts.length}</span>
               </div>
             </div>
           </div>
 
           {/* Critical Signals */}
           <div className="glass-panel">
-            <div className="px-3 py-2 border-b border-border-subtle bg-panel/50">
+            <div className="px-3 py-2 border-b border-border-dim bg-bg-panel/50">
               <span className="font-mono text-[10px] font-bold text-accent-red">⚠️ CRITICAL SIGNALS</span>
             </div>
             <div className="p-2 space-y-1 max-h-[200px] overflow-y-auto">
               {signals.filter(s => s.severity === 'CRITICAL' || s.severity === 'HIGH').slice(0, 5).map(s => (
-                <div key={s.id} className="px-2 py-1.5 bg-elevated/50 rounded">
-                  <div className="text-[9px] text-white leading-tight">{s.title.substring(0, 60)}...</div>
+                <div key={s.id} className="px-2 py-1.5 bg-bg-elevated/50 rounded">
+                  <div className="text-[9px] text-text-primary leading-tight">{s.title.substring(0, 60)}...</div>
                   <div className="text-[8px] text-text-dim mt-0.5">{s.source} • {s.timeAgo}</div>
                 </div>
               ))}

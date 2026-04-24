@@ -5,7 +5,7 @@ import { ThreatLevel } from '@/types';
 import LanguageSelector from './LanguageSelector';
 import { Language, t } from '@/lib/i18n';
 
-// ─── Theme Toggle Hook ────────────────────────────────────────────────────────
+// ─── Theme Toggle Hook ──────────────────────────────────────────────────────────────────────
 export function useTheme() {
   const [isDark, setIsDark] = useState(true);
 
@@ -35,16 +35,16 @@ export function useTheme() {
   return { isDark, toggle };
 }
 
-// ─── Theme Toggle Button ──────────────────────────────────────────────────────
+// ─── Theme Toggle Button ─────────────────────────────────────────────────────────────────
 export function ThemeToggle({ isDark, onToggle }: { isDark: boolean; onToggle: () => void }) {
   return (
     <button
       onClick={onToggle}
-      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-white/10 hover:border-white/25 bg-white/5 hover:bg-white/10 transition-all"
+      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-text-primary/10 hover:border-text-primary/25 bg-text-primary/5 hover:bg-text-primary/10 transition-all"
       title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
     >
       <span className="text-sm">{isDark ? '☀️' : '🌙'}</span>
-      <span className="text-[9px] font-mono text-white/50 hidden sm:block">
+      <span className="text-[9px] font-mono text-text-muted hidden sm:block">
         {isDark ? 'LIGHT' : 'DARK'}
       </span>
     </button>
@@ -53,7 +53,7 @@ export function ThemeToggle({ isDark, onToggle }: { isDark: boolean; onToggle: (
 
 const THREAT_COLORS: Record<ThreatLevel, string> = {
   LOW: '#00ff88',
-  GUARDED: '#00ccff',
+  GUARDED: '#00d4ff',
   ELEVATED: '#ffaa00',
   HIGH: '#ff6633',
   SEVERE: '#ff2244'
@@ -105,7 +105,7 @@ export default function Header({ threatLevel, breakingNews, lastUpdate, signalCo
             <span className="text-accent-red animate-pulse">⚠</span>
             <span className="text-accent-red font-mono text-[9px] sm:text-[10px] font-bold tracking-wider">BREAKING</span>
           </div>
-          <span className="text-[10px] sm:text-[11px] text-white/90 truncate flex-1">{breakingNews}</span>
+          <span className="text-[10px] sm:text-[11px] text-text-primary/90 truncate flex-1">{breakingNews}</span>
         </div>
       )}
       
@@ -113,7 +113,7 @@ export default function Header({ threatLevel, breakingNews, lastUpdate, signalCo
       <div className="hidden sm:flex px-4 py-2 items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="relative w-9 h-9 rounded-lg bg-gradient-to-br from-accent-green/30 to-accent-blue/20 flex items-center justify-center border border-accent-green/30">
+          <div className="relative w-9 h-9 rounded-lg bg-gradient-to-br from-accent-green/30 to-accent-cyan/20 flex items-center justify-center border border-accent-green/30">
             <span className="text-accent-green text-xl">🌐</span>
             <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-accent-green rounded-full border-2 border-elevated animate-pulse" />
           </div>
@@ -166,13 +166,13 @@ export default function Header({ threatLevel, breakingNews, lastUpdate, signalCo
           )}
           
           <div className="text-right">
-            <div className="font-mono text-lg text-white tracking-wide">{utcTime}</div>
+            <div className="font-mono text-lg text-text-primary tracking-wide">{utcTime}</div>
             <div className="font-mono text-[9px] text-text-muted">UTC</div>
           </div>
           <div className="text-right border-l border-border-subtle pl-4">
             <div className="flex items-center gap-1.5 justify-end">
-              <div className={`w-2 h-2 rounded-full ${updateAgo < 120 ? 'bg-accent-green animate-pulse' : 'bg-accent-gold'}`} />
-              <span className="font-mono text-[11px] text-white">{updateAgo < 60 ? 'LIVE' : 'SYNCING'}</span>
+              <div className={`w-2 h-2 rounded-full ${updateAgo < 120 ? 'bg-accent-green animate-pulse' : 'bg-accent-amber'}`} />
+              <span className="font-mono text-[11px] text-text-primary">{updateAgo < 60 ? 'LIVE' : 'SYNCING'}</span>
             </div>
             <div className="font-mono text-[9px] text-text-dim">{updateAgo < 60 ? `${updateAgo}s` : `${Math.floor(updateAgo / 60)}m`} ago</div>
           </div>
@@ -182,7 +182,7 @@ export default function Header({ threatLevel, breakingNews, lastUpdate, signalCo
       {/* Main header - Mobile */}
       <div className="sm:hidden px-3 py-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-accent-green/30 to-accent-blue/20 flex items-center justify-center">
+          <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-accent-green/30 to-accent-cyan/20 flex items-center justify-center">
             <span className="text-accent-green text-lg">🌐</span>
             <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-accent-green rounded-full animate-pulse" />
           </div>
@@ -204,8 +204,8 @@ export default function Header({ threatLevel, breakingNews, lastUpdate, signalCo
           
           {/* Live indicator */}
           <div className="flex items-center gap-1 px-2 py-1 bg-elevated rounded">
-            <div className={`w-1.5 h-1.5 rounded-full ${updateAgo < 120 ? 'bg-accent-green animate-pulse' : 'bg-accent-gold'}`} />
-            <span className="font-mono text-[9px] text-white">{utcTime.substring(0, 5)}</span>
+            <div className={`w-1.5 h-1.5 rounded-full ${updateAgo < 120 ? 'bg-accent-green animate-pulse' : 'bg-accent-amber'}`} />
+            <span className="font-mono text-[9px] text-text-primary">{utcTime.substring(0, 5)}</span>
           </div>
         </div>
       </div>

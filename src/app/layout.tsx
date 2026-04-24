@@ -1,5 +1,23 @@
 import type { Metadata } from 'next'
+import { IBM_Plex_Mono, Inter, Orbitron } from 'next/font/google'
 import './globals.css'
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-mono',
+})
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-body',
+})
+
+const orbitron = Orbitron({
+  subsets: ['latin'],
+  weight: ['400', '500', '700', '900'],
+  variable: '--font-accent',
+})
 
 export const metadata: Metadata = {
   title: 'GlobeNews Live | Real-Time Global Intelligence',
@@ -30,7 +48,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-void text-white min-h-screen">
+      <body className={`${ibmPlexMono.variable} ${inter.variable} ${orbitron.variable} bg-void text-text-primary min-h-screen`}>
         {children}
       </body>
     </html>
