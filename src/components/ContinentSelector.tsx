@@ -2,8 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { latLonToVec3 } from './Globe3D';
-import * as THREE from 'three';
 
 export interface ContinentSelectorProps {
   onSelect: (target: { lat: number; lon: number; zoom: number }) => void;
@@ -73,33 +71,4 @@ export default function ContinentSelector({ onSelect }: ContinentSelectorProps) 
       )}
     </div>
   );
-}
-
-// Manual lerp animation for camera
-export function animateCameraTo(
-  camera: { position: THREE.Vector3; lookAt: (x: number, y: number, z: number) => void },
-  target: { lat: number; lon: number; zoom: number },
-  duration = 1200
-) {
-  const targetPos = latLonToVec3(target.lat, target.lon, target.zoom);
-  const startPos = camera.position.clone();
-  const startTime = performance.now();
-
-  const easeInOutCubic = (t: number) =>
-    t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
-  const tick = (now: number) => {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const eased = easeInOutCubic(progress);
-
-    camera.position.lerpVectors(startPos, targetPos, eased);
-    camera.lookAt(0, 0, 0);
-
-    if (progress < 1) {
-      requestAnimationFrame(tick);
-    }
-  };
-
-  requestAnimationFrame(tick);
 }

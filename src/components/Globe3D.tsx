@@ -2,7 +2,7 @@
 
 import { useRef, useMemo, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Stars } from '@react-three/drei';
+import { OrbitControls, Stars, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { MissileEvent, MissileEventType } from '@/types';
 
@@ -78,62 +78,10 @@ const atmosphereFragmentShader = `
 
 // ─── Earth ───
 function Earth({ wireframe = false }: { wireframe?: boolean }) {
-  const earthTexture = useMemo(() => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 512;
-    const ctx = canvas.getContext('2d')!;
-    ctx.fillStyle = '#0a1628';
-    ctx.fillRect(0, 0, 1024, 512);
-    ctx.fillStyle = '#1a2f1a';
-    const continents = [
-      [180, 160, 80, 60, -0.3],
-      [240, 320, 40, 80, 0.2],
-      [500, 140, 50, 35, 0],
-      [520, 260, 55, 90, 0],
-      [700, 150, 120, 70, 0],
-      [820, 360, 50, 30, 0],
-    ];
-    continents.forEach(([x, y, rx, ry, rot]) => {
-      ctx.beginPath();
-      ctx.ellipse(x as number, y as number, rx as number, ry as number, rot as number, 0, Math.PI * 2);
-      ctx.fill();
-    });
-    for (let i = 0; i < 5000; i++) {
-      ctx.fillStyle = `rgba(100, 140, 180, ${Math.random() * 0.08})`;
-      ctx.fillRect(Math.random() * 1024, Math.random() * 512, 2, 2);
-    }
-    const tex = new THREE.CanvasTexture(canvas);
-    tex.needsUpdate = true;
-    return tex;
-  }, []);
-
-  const nightTexture = useMemo(() => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 512;
-    const ctx = canvas.getContext('2d')!;
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, 1024, 512);
-    const cities = [
-      [39.9, 116.4], [35.7, 139.7], [28.6, 77.2], [19.1, 72.9], [1.4, 103.8],
-      [55.8, 37.6], [51.5, -0.1], [48.9, 2.3], [52.5, 13.4], [40.7, -74.0],
-      [34.1, -118.2], [41.9, -87.6], [25.8, -80.2], [-23.5, -46.6], [-34.6, -58.4],
-      [30.0, 31.2], [33.3, 44.4], [24.7, 46.7], [32.1, 34.8], [37.6, 127.0],
-    ];
-    cities.forEach(([lat, lon]) => {
-      const x = ((lon + 180) / 360) * 1024;
-      const y = ((90 - lat) / 180) * 512;
-      const grad = ctx.createRadialGradient(x, y, 0, x, y, 8);
-      grad.addColorStop(0, 'rgba(255, 220, 120, 0.8)');
-      grad.addColorStop(1, 'rgba(255, 180, 60, 0)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(x - 8, y - 8, 16, 16);
-    });
-    const tex = new THREE.CanvasTexture(canvas);
-    tex.needsUpdate = true;
-    return tex;
-  }, []);
+  const textures = useTexture({
+    map: '//unpkg.com/three-globe/example/img/earth-night.jpg',
+    bumpMap: '//unpkg.com/three-globe/example/img/earth-topology.png',
+  });
 
   return (
     <mesh>
@@ -142,10 +90,12 @@ function Earth({ wireframe = false }: { wireframe?: boolean }) {
         <meshBasicMaterial color="#0f1830" wireframe />
       ) : (
         <meshStandardMaterial
-          map={earthTexture}
-          emissiveMap={nightTexture}
+          map={textures.map}
+          bumpMap={textures.bumpMap}
+          bumpScale={0.05}
+          emissiveMap={textures.map}
           emissive={new THREE.Color('#ffcc66')}
-          emissiveIntensity={0.4}
+          emissiveIntensity={0.6}
           roughness={0.8}
           metalness={0.1}
         />
@@ -382,6 +332,22 @@ const CameraController = forwardRef(function CameraController(
       const dist = camera.position.length();
       if (dist > 8) camera.position.setLength(8);
     },
+    flyTo: (target: { lat: number; lon: number; zoom?: number }) => {
+      const targetPos = latLonToVec3(target.lat, target.lon, EARTH_RADIUS + (target.zoom ?? 4) * 0.4);
+      const startPos = camera.position.clone();
+      const startTime = performance.now();
+      const duration = 1500;
+      const easeInOutCubic = (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const tick = (now: number) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = easeInOutCubic(progress);
+        camera.position.lerpVectors(startPos, targetPos, eased);
+        camera.lookAt(0, 0, 0);
+        if (progress < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    },
     getCamera: () => camera,
     getControls: () => controlsRef.current,
   }));
@@ -461,6 +427,7 @@ function Scene({
 export interface Globe3DRef {
   zoomIn: () => void;
   zoomOut: () => void;
+  flyTo: (target: { lat: number; lon: number; zoom?: number }) => void;
   getCamera: () => THREE.Camera;
 }
 
