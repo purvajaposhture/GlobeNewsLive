@@ -539,7 +539,7 @@ const LS_SETTINGS = "globenews_settings";
 const LS_SAVED = "globenews_saved_layouts";
 const LS_CURRENT = "globenews_current_preset";
 const LS_VERSION = "globenews_version";
-const CURRENT_VERSION = "3.1.0"; // Bump this to reset layouts
+const CURRENT_VERSION = "3.1.1"; // Bump this to reset layouts
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
@@ -1269,6 +1269,7 @@ export default function CustomDashboard({
                   gap: "16px",
                   minHeight: "100%",
                   alignContent: "start",
+                  alignItems: "start",
                 }}
               >
                 {otherVisibleWidgets.map((widgetId) => {
@@ -1283,7 +1284,7 @@ export default function CustomDashboard({
                         borderColor: "rgba(255,255,255,0.07)",
                         boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
                         transition: "border-color 0.2s, box-shadow 0.2s",
-                        minHeight: "400px",
+                        minHeight: widgetId === 'world-map' ? '540px' : '400px',
                       }}
                     >
                       {/* Widget Header */}

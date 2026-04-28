@@ -1,0 +1,250 @@
+[
+  {
+    "rank": 1,
+    "code": "NO",
+    "country": "Norway",
+    "days": 892,
+    "delta": 324,
+    "avgDays": 568
+  },
+  {
+    "rank": 2,
+    "code": "CA",
+    "country": "Canada",
+    "days": 456,
+    "delta": 112,
+    "avgDays": 344
+  },
+  {
+    "rank": 3,
+    "code": "US",
+    "country": "United States",
+    "days": 412,
+    "delta": 87,
+    "avgDays": 325
+  },
+  {
+    "rank": 4,
+    "code": "QA",
+    "country": "Qatar",
+    "days": 398,
+    "delta": 156,
+    "avgDays": 242
+  },
+  {
+    "rank": 5,
+    "code": "AU",
+    "country": "Australia",
+    "days": 367,
+    "delta": 98,
+    "avgDays": 269
+  },
+  {
+    "rank": 6,
+    "code": "RU",
+    "country": "Russia",
+    "days": 345,
+    "delta": -124,
+    "avgDays": 469
+  },
+  {
+    "rank": 7,
+    "code": "SA",
+    "country": "Saudi Arabia",
+    "days": 312,
+    "delta": 203,
+    "avgDays": 109
+  },
+  {
+    "rank": 8,
+    "code": "DZ",
+    "country": "Algeria",
+    "days": 298,
+    "delta": 67,
+    "avgDays": 231
+  },
+  {
+    "rank": 9,
+    "code": "AE",
+    "country": "UAE",
+    "days": 287,
+    "delta": 134,
+    "avgDays": 153
+  },
+  {
+    "rank": 10,
+    "code": "KW",
+    "country": "Kuwait",
+    "days": 276,
+    "delta": 89,
+    "avgDays": 187
+  },
+  {
+    "rank": 11,
+    "code": "IQ",
+    "country": "Iraq",
+    "days": 254,
+    "delta": 45,
+    "avgDays": 209
+  },
+  {
+    "rank": 12,
+    "code": "NG",
+    "country": "Nigeria",
+    "days": 231,
+    "delta": -34,
+    "avgDays": 265
+  },
+  {
+    "rank": 13,
+    "code": "KZ",
+    "country": "Kazakhstan",
+    "days": 218,
+    "delta": 56,
+    "avgDays": 162
+  },
+  {
+    "rank": 14,
+    "code": "BR",
+    "country": "Brazil",
+    "days": 198,
+    "delta": 23,
+    "avgDays": 175
+  },
+  {
+    "rank": 15,
+    "code": "MX",
+    "country": "Mexico",
+    "days": 187,
+    "delta": -12,
+    "avgDays": 199
+  },
+  {
+    "rank": 16,
+    "code": "MY",
+    "country": "Malaysia",
+    "days": 176,
+    "delta": 34,
+    "avgDays": 142
+  },
+  {
+    "rank": 17,
+    "code": "ID",
+    "country": "Indonesia",
+    "days": 165,
+    "delta": 18,
+    "avgDays": 147
+  },
+  {
+    "rank": 18,
+    "code": "GB",
+    "country": "United Kingdom",
+    "days": 156,
+    "delta": -45,
+    "avgDays": 201
+  },
+  {
+    "rank": 19,
+    "code": "NL",
+    "country": "Netherlands",
+    "days": 148,
+    "delta": -67,
+    "avgDays": 215
+  },
+  {
+    "rank": 20,
+    "code": "TR",
+    "country": "Turkiye",
+    "days": 142,
+    "delta": 12,
+    "avgDays": 130
+  },
+  {
+    "rank": 21,
+    "code": "AT",
+    "country": "Austria",
+    "days": 114,
+    "delta": 24,
+    "avgDays": 90
+  },
+  {
+    "rank": 22,
+    "code": "IE",
+    "country": "Ireland",
+    "days": 108,
+    "delta": 18,
+    "avgDays": 90
+  },
+  {
+    "rank": 23,
+    "code": "ES",
+    "country": "Spain",
+    "days": 102,
+    "delta": -8,
+    "avgDays": 110
+  },
+  {
+    "rank": 24,
+    "code": "NZ",
+    "country": "New Zealand",
+    "days": 96,
+    "delta": 5,
+    "avgDays": 91
+  },
+  {
+    "rank": 25,
+    "code": "JP",
+    "country": "Japan",
+    "days": 87,
+    "delta": -23,
+    "avgDays": 110
+  },
+  {
+    "rank": 26,
+    "code": "KR",
+    "country": "South Korea",
+    "days": 76,
+    "delta": -34,
+    "avgDays": 110
+  },
+  {
+    "rank": 27,
+    "code": "IN",
+    "country": "India",
+    "days": 68,
+    "delta": 12,
+    "avgDays": 56
+  },
+  {
+    "rank": 28,
+    "code": "CN",
+    "country": "China",
+    "days": 54,
+    "delta": -56,
+    "avgDays": 110
+  },
+  {
+    "rank": 29,
+    "code": "DE",
+    "country": "Germany",
+    "days": 48,
+    "delta": -78,
+    "avgDays": 126
+  },
+  {
+    "rank": 30,
+    "code": "IT",
+    "country": "Italy",
+    "days": 42,
+    "delta": -34,
+    "avgDays": 76
+  },
+  {
+    "rank": 31,
+    "code": "FR",
+    "country": "France",
+    "days": 38,
+    "delta": -45,
+    "avgDays": 83
+  }
+]
