@@ -59,11 +59,9 @@ export default function FinanceDashboardFull() {
           {/* 1. MAP — fixed 420px */}
           <div className="shrink-0 h-[420px] relative border-b border-white/5 overflow-hidden">
             <WorldMap
+              signals={[]}
               activeLayers={[]}
               onLayerToggle={() => {}}
-              financeMode={true}
-              financeLayers={activeLayers}
-              height={420}
             />
           </div>
 
