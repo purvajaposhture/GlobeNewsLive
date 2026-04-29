@@ -1,0 +1,218 @@
+[
+  {
+    "name": "Antonio Ricaurte Pipeline (Colombia-Venezuela)",
+    "operator": "TGI / PDVSA",
+    "from": "CO",
+    "to": "VE",
+    "capacity": 5.0,
+    "unit": "bcm/yr",
+    "status": "OFFLINE"
+  },
+  {
+    "name": "Arab Gas Pipeline",
+    "operator": "ARAB GAS PIPELINE CONSORTIUM",
+    "from": "EG",
+    "to": "LB",
+    "capacity": 10.3,
+    "unit": "bcm/yr",
+    "status": "OFFLINE"
+  },
+  {
+    "name": "Bolivia-Argentina (Yacuiba)",
+    "operator": "YPFB / ENERGÍA ARGENTINA",
+    "from": "BO",
+    "to": "AR",
+    "capacity": 7.7,
+    "unit": "bcm/yr",
+    "status": "REDUCED"
+  },
+  {
+    "name": "Brotherhood & Soyuz (Transit via Ukraine)",
+    "operator": "GAZPROM / NAFTOGAZ",
+    "from": "RU",
+    "to": "SK",
+    "capacity": 142.0,
+    "unit": "bcm/yr",
+    "status": "OFFLINE"
+  },
+  {
+    "name": "Central Asia-Center (CAC)",
+    "operator": "GAZPROM / TÜRKMENGAZ",
+    "from": "TM",
+    "to": "RU",
+    "capacity": 44.0,
+    "unit": "bcm/yr",
+    "status": "REDUCED"
+  },
+  {
+    "name": "Druzhba Pipeline",
+    "operator": "TRANSNEFT",
+    "from": "RU",
+    "to": "DE",
+    "capacity": 1.0,
+    "unit": "mbbl/d",
+    "status": "REDUCED"
+  },
+  {
+    "name": "East-West Pipeline (Saudi Arabia)",
+    "operator": "SAUDI ARAMCO",
+    "from": "SA",
+    "to": "SA",
+    "capacity": 5.0,
+    "unit": "mbbl/d",
+    "status": "ONLINE"
+  },
+  {
+    "name": "ESPO (Eastern Siberia-Pacific)",
+    "operator": "TRANSNEFT",
+    "from": "RU",
+    "to": "CN",
+    "capacity": 1.6,
+    "unit": "mbbl/d",
+    "status": "ONLINE"
+  },
+  {
+    "name": "Green Stream (Libya-Italy)",
+    "operator": "ENI / NOC",
+    "from": "LY",
+    "to": "IT",
+    "capacity": 8.0,
+    "unit": "bcm/yr",
+    "status": "ONLINE"
+  },
+  {
+    "name": "Iran-Pakistan Pipeline",
+    "operator": "NIGC / SSGCL",
+    "from": "IR",
+    "to": "PK",
+    "capacity": 21.2,
+    "unit": "bcm/yr",
+    "status": "OFFLINE"
+  },
+  {
+    "name": "Kashagan Oil Pipeline",
+    "operator": "NCOC / ENI",
+    "from": "KZ",
+    "to": "KZ",
+    "capacity": 1.2,
+    "unit": "mbbl/d",
+    "status": "ONLINE"
+  },
+  {
+    "name": "Medgaz (Algeria-Spain)",
+    "operator": "SONATRACH / CEPSA",
+    "from": "DZ",
+    "to": "ES",
+    "capacity": 10.0,
+    "unit": "bcm/yr",
+    "status": "ONLINE"
+  },
+  {
+    "name": "Nord Stream 1",
+    "operator": "NORD STREAM AG",
+    "from": "RU",
+    "to": "DE",
+    "capacity": 55.0,
+    "unit": "bcm/yr",
+    "status": "OFFLINE"
+  },
+  {
+    "name": "Nord Stream 2",
+    "operator": "NORD STREAM 2 AG",
+    "from": "RU",
+    "to": "DE",
+    "capacity": 55.0,
+    "unit": "bcm/yr",
+    "status": "OFFLINE"
+  },
+  {
+    "name": "Power of Siberia",
+    "operator": "GAZPROM / CNPC",
+    "from": "RU",
+    "to": "CN",
+    "capacity": 38.0,
+    "unit": "bcm/yr",
+    "status": "ONLINE"
+  },
+  {
+    "name": "Strategic Petroleum Reserve (US)",
+    "operator": "DOE",
+    "from": "US",
+    "to": "US",
+    "capacity": 714.0,
+    "unit": "mbbl",
+    "status": "ONLINE"
+  },
+  {
+    "name": "Taba-Türkmenbashy (Turkmenistan-Türkiye)",
+    "operator": "BOTAS / TÜRKMENGAZ",
+    "from": "TM",
+    "to": "TR",
+    "capacity": 16.0,
+    "unit": "bcm/yr",
+    "status": "REDUCED"
+  },
+  {
+    "name": "TANAP (Trans-Anatolian)",
+    "operator": "BOTAS / SOCAR",
+    "from": "TR",
+    "to": "TR",
+    "capacity": 16.0,
+    "unit": "bcm/yr",
+    "status": "ONLINE"
+  },
+  {
+    "name": "TAP (Trans-Adriatic)",
+    "operator": "TAP AG",
+    "from": "TR",
+    "to": "IT",
+    "capacity": 10.0,
+    "unit": "bcm/yr",
+    "status": "ONLINE"
+  },
+  {
+    "name": "Trans-Mediterranean (Algeria-Italy)",
+    "operator": "SONATRACH / ENI",
+    "from": "DZ",
+    "to": "IT",
+    "capacity": 34.0,
+    "unit": "bcm/yr",
+    "status": "ONLINE"
+  },
+  {
+    "name": "Trans-Saharan (Nigeria-Algeria)",
+    "operator": "NNPC / SONATRACH",
+    "from": "NG",
+    "to": "DZ",
+    "capacity": 30.0,
+    "unit": "bcm/yr",
+    "status": "OFFLINE"
+  },
+  {
+    "name": "TurkStream",
+    "operator": "GAZPROM / BOTAŞ",
+    "from": "RU",
+    "to": "TR",
+    "capacity": 31.5,
+    "unit": "bcm/yr",
+    "status": "ONLINE"
+  },
+  {
+    "name": "West-East Pipeline (China)",
+    "operator": "CNPC",
+    "from": "CN",
+    "to": "CN",
+    "capacity": 17.0,
+    "unit": "bcm/yr",
+    "status": "ONLINE"
+  },
+  {
+    "name": "Yamal-Europe",
+    "operator": "GAZPROM",
+    "from": "RU",
+    "to": "PL",
+    "capacity": 33.0,
+    "unit": "bcm/yr",
+    "status": "OFFLINE"
+  }
+]
