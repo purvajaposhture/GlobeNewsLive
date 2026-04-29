@@ -27,9 +27,11 @@ const config: Config = {
         'text-dim': 'var(--text-dim)',
       },
       fontFamily: {
-        mono: ['var(--font-mono)', 'IBM Plex Mono', 'monospace'],
+        sans: ['var(--font-geist)', 'var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono)', 'JetBrains Mono', 'Fira Code', 'monospace'],
         body: ['var(--font-body)', 'Inter', 'system-ui', 'sans-serif'],
         accent: ['var(--font-accent)', 'Orbitron', 'sans-serif'],
+        geist: ['var(--font-geist)', 'system-ui', 'sans-serif'],
       }
     }
   },

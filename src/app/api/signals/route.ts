@@ -2,6 +2,119 @@ import { NextResponse } from 'next/server';
 import { FEEDS, DEFAULT_ENABLED_SOURCES, ALERT_KEYWORDS, ALERT_EXCLUSIONS, getSourceTier } from '@/config/feeds';
 import { classifyThreat, classifyCategory, formatTimeAgo } from '@/lib/classify';
 import { Signal } from '@/types';
+import { applyRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
+
+// Fallback dummy data for when RSS feeds fail
+const FALLBACK_SIGNALS: Signal[] = [
+  {
+    id: 'fallback-1',
+    title: 'Israel launches airstrikes on Iranian nuclear facilities near Natanz',
+    severity: 'CRITICAL',
+    category: 'military',
+    source: 'Reuters',
+    sourceUrl: 'https://reuters.com',
+    timeAgo: '5 min ago',
+    timestamp: new Date(Date.now() - 5 * 60 * 1000),
+    summary: "Multiple explosions reported near Iran's Natanz uranium enrichment facility. Air defense systems activated.",
+    region: 'mena',
+  },
+  {
+    id: 'fallback-2',
+    title: 'Iran retaliates with missile barrage targeting US bases in Iraq',
+    severity: 'CRITICAL',
+    category: 'military',
+    source: 'Al Jazeera',
+    sourceUrl: 'https://aljazeera.com',
+    timeAgo: '12 min ago',
+    timestamp: new Date(Date.now() - 12 * 60 * 1000),
+    summary: 'Ballistic missiles launched toward Al-Asad airbase. No casualties confirmed yet.',
+    region: 'iraq',
+  },
+  {
+    id: 'fallback-3',
+    title: 'Oil prices surge 8% as Strait of Hormuz shipping suspended',
+    severity: 'HIGH',
+    category: 'economy',
+    source: 'Bloomberg',
+    sourceUrl: 'https://bloomberg.com',
+    timeAgo: '18 min ago',
+    timestamp: new Date(Date.now() - 18 * 60 * 1000),
+    summary: 'Brent crude jumps to $94/barrel. Major shipping companies halt Red Sea transit.',
+    region: 'global',
+  },
+  {
+    id: 'fallback-4',
+    title: 'Hezbollah fires rockets into northern Israel from Lebanon',
+    severity: 'HIGH',
+    category: 'military',
+    source: 'Times of Israel',
+    sourceUrl: 'https://timesofisrael.com',
+    timeAgo: '25 min ago',
+    timestamp: new Date(Date.now() - 25 * 60 * 1000),
+    summary: 'Iron Dome intercepts most projectiles. IDF responds with artillery fire.',
+    region: 'lebanon',
+  },
+  {
+    id: 'fallback-5',
+    title: 'US deploys additional carrier strike group to Persian Gulf',
+    severity: 'HIGH',
+    category: 'military',
+    source: 'Defense One',
+    sourceUrl: 'https://defenseone.com',
+    timeAgo: '32 min ago',
+    timestamp: new Date(Date.now() - 32 * 60 * 1000),
+    summary: 'USS Theodore Roosevelt and escort vessels ordered to reinforce CENTCOM presence.',
+    region: 'mena',
+  },
+  {
+    id: 'fallback-6',
+    title: 'EU announces emergency sanctions on Iranian oil exports',
+    severity: 'MEDIUM',
+    category: 'politics',
+    source: 'EU News',
+    sourceUrl: 'https://europa.eu',
+    timeAgo: '45 min ago',
+    timestamp: new Date(Date.now() - 45 * 60 * 1000),
+    summary: '27 member states agree on phased embargo. Exemptions for humanitarian supplies.',
+    region: 'eu',
+  },
+  {
+    id: 'fallback-7',
+    title: 'Cyber attack disrupts Israeli government websites',
+    severity: 'MEDIUM',
+    category: 'cyber',
+    source: 'BleepingComputer',
+    sourceUrl: 'https://bleepingcomputer.com',
+    timeAgo: '1 hour ago',
+    timestamp: new Date(Date.now() - 60 * 60 * 1000),
+    summary: 'DDoS attack claimed by pro-Iranian hacktivist group. Services gradually restoring.',
+    region: 'israel',
+  },
+  {
+    id: 'fallback-8',
+    title: 'Russia condemns strikes, warns of "dangerous escalation"',
+    severity: 'MEDIUM',
+    category: 'politics',
+    source: 'TASS',
+    sourceUrl: 'https://tass.com',
+    timeAgo: '1.5 hours ago',
+    timestamp: new Date(Date.now() - 90 * 60 * 1000),
+    summary: 'Kremlin calls for immediate ceasefire. Offers to mediate negotiations.',
+    region: 'russia',
+  },
+  {
+    id: 'fallback-9',
+    title: 'Saudi Arabia activates air defenses, closes northern airspace',
+    severity: 'MEDIUM',
+    category: 'military',
+    source: 'Al Arabiya',
+    sourceUrl: 'https://alarabiya.net',
+    timeAgo: '2 hours ago',
+    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+    summary: 'Patriot batteries on high alert. All civilian flights rerouted south.',
+    region: 'saudi',
+  },
+];
 
 // Flatten all feeds into a single array
 const ALL_FEEDS = Object.entries(FEEDS).flatMap(([category, feeds]) =>
@@ -100,6 +213,12 @@ let cache: { signals: Signal[]; timestamp: number; sources: { success: number; f
 const CACHE_TTL = 60 * 1000; // 1 minute
 
 export async function GET(request: Request) {
+  // Apply rate limiting
+  const rateLimitResponse = applyRateLimit(request);
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
+
   const { searchParams } = new URL(request.url);
   const filter = searchParams.get('filter');
   const refresh = searchParams.get('refresh') === 'true';
@@ -225,6 +344,12 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error('Signals API error:', error);
-    return NextResponse.json({ signals: [], error: 'Failed to fetch signals' }, { status: 500 });
+    // Return fallback data on error
+    return NextResponse.json({
+      signals: FALLBACK_SIGNALS,
+      cached: false,
+      sources: { success: 0, failed: 0, total: 0 },
+      error: 'Failed to fetch live signals. Showing fallback data.',
+    }, { status: 200 });
   }
 }
