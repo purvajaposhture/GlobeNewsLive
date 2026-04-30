@@ -57,6 +57,9 @@ export default function ProDashboard() {
             </Link>
             <span className="text-gray-500">|</span>
             <span className="text-sm text-gray-400">Pro Dashboard</span>
+            <Link href="/economic" className="text-xs text-blue-400 hover:text-blue-300">
+              📈 Economic
+            </Link>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-xs text-gray-500">

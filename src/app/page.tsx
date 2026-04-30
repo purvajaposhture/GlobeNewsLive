@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import Header, { useTheme } from '@/components/Header';
@@ -434,6 +435,12 @@ export default function Dashboard() {
           >
             🗺️ MAP FOCUS
           </button>
+          <Link
+            href="/economic"
+            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white hover:bg-white/5 transition-colors"
+          >
+            📈 ECONOMIC
+          </Link>
         </div>
         <div className="flex items-center gap-3">
           <KeyboardShortcutsHelp />

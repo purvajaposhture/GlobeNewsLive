@@ -1,9 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import FinanceDashboard from '@/components/finance/FinanceDashboard';
+import EconomicDashboard from '@/components/economic/EconomicDashboard';
 
-export default function FinancialPage() {
+export default function EconomicPage() {
   return (
     <div className="h-screen flex flex-col bg-void overflow-hidden">
       {/* Header */}
@@ -15,9 +16,9 @@ export default function FinancialPage() {
           <div>
             <h1 className="font-mono text-sm font-bold tracking-wider text-accent-green flex items-center gap-2">
               GLOBENEWS
-              <span className="px-1.5 py-0.5 bg-accent-blue/20 text-[8px] rounded border border-accent-blue/30 text-accent-blue">FINANCE</span>
+              <span className="px-1.5 py-0.5 bg-accent-blue/20 text-[8px] rounded border border-accent-blue/30 text-accent-blue">ECONOMIC</span>
             </h1>
-            <p className="text-[9px] text-text-muted">Real-time global markets & intelligence</p>
+            <p className="text-[9px] text-text-muted">Real-time economic intelligence & indicators</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -26,6 +27,12 @@ export default function FinancialPage() {
             className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white hover:bg-white/5 transition-colors"
           >
             🌐 DASHBOARD
+          </Link>
+          <Link
+            href="/financial"
+            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white hover:bg-white/5 transition-colors"
+          >
+            💰 FINANCE
           </Link>
           <Link
             href="/economic"
@@ -42,9 +49,9 @@ export default function FinancialPage() {
         </div>
       </header>
 
-      {/* Finance Dashboard Content */}
+      {/* Economic Dashboard Content */}
       <main className="flex-1 overflow-hidden">
-        <FinanceDashboard />
+        <EconomicDashboard />
       </main>
     </div>
   );
