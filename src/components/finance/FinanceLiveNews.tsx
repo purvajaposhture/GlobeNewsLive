@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import useSWR from 'swr';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
@@ -42,10 +42,9 @@ function getSourceAbbrev(source: string): string {
 
 interface FinanceLiveNewsProps {
   maxItems?: number;
-  height?: number;
 }
 
-export default function FinanceLiveNews({ maxItems = 20, height = 180 }: FinanceLiveNewsProps) {
+export default function FinanceLiveNews({ maxItems = 20 }: FinanceLiveNewsProps) {
   const { data, isLoading } = useSWR<{ signals: SignalItem[] }>(
     '/api/signals',
     fetcher,
@@ -53,17 +52,43 @@ export default function FinanceLiveNews({ maxItems = 20, height = 180 }: Finance
   );
 
   const [isPaused, setIsPaused] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const articles = (data?.signals ?? [])
     .filter(s => s.title && s.sourceUrl)
     .slice(0, maxItems);
 
   const count = data?.signals?.length ?? 0;
-  const shouldScroll = articles.length > 4;
-  const display = shouldScroll ? [...articles, ...articles] : articles;
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (isPaused || articles.length <= 4) return;
+    
+    const container = scrollRef.current;
+    if (!container) return;
+
+    let animationId: number;
+    let scrollPos = 0;
+    const speed = 0.5; // pixels per frame
+
+    const animate = () => {
+      scrollPos += speed;
+      const maxScroll = container.scrollHeight - container.clientHeight;
+      
+      if (scrollPos >= maxScroll) {
+        scrollPos = 0; // loop back to top
+      }
+      
+      container.scrollTop = scrollPos;
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animationId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationId);
+  }, [isPaused, articles.length]);
 
   return (
-    <div className="shrink-0 border-b border-white/5 bg-[#0f0f14]" style={{ height: `${height}px`, overflow: 'hidden' }}>
+    <div className="shrink-0 border-b border-white/5 bg-[#0f0f14]">
       {/* Panel header */}
       <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/5">
         <div className="flex items-center gap-2">
@@ -80,10 +105,11 @@ export default function FinanceLiveNews({ maxItems = 20, height = 180 }: Finance
         </span>
       </div>
 
-      {/* Scrolling ticker */}
+      {/* Scrolling container */}
       <div
+        ref={scrollRef}
         className="relative overflow-hidden"
-        style={{ height: `${height - 36}px` }}
+        style={{ height: '160px' }}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
@@ -98,11 +124,8 @@ export default function FinanceLiveNews({ maxItems = 20, height = 180 }: Finance
             <span className="text-[10px] font-mono text-gray-600">No headlines available</span>
           </div>
         ) : (
-          <div
-            className={`flex flex-col ${shouldScroll ? 'animate-scroll-ticker' : ''}`}
-            style={{ animationPlayState: isPaused ? 'paused' : 'running' }}
-          >
-            {display.map((article, i) => (
+          <div className="flex flex-col">
+            {articles.map((article, i) => (
               <a
                 key={`${article.id}-${i}`}
                 href={article.sourceUrl}

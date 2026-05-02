@@ -15,6 +15,8 @@ import NewsPanel from './NewsPanel';
 import FinanceTicker from './FinanceTicker';
 import MarketComposite from './MarketComposite';
 import FinanceLiveNews from './FinanceLiveNews';
+import WorldClockPanel from '@/components/WorldClockPanel';
+import EconomicPanel from '@/components/EconomicPanel';
 
 const WorldMap = dynamic(() => import('@/components/WorldMap'), {
   ssr: false,
@@ -47,43 +49,54 @@ export default function FinanceDashboardFull() {
       </div>
 
       {/* 3-column layout */}
-      <div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-[280px_1fr_320px] gap-2 p-2">
+      <div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-[280px_1fr_340px] gap-2 p-2">
         {/* LEFT COLUMN */}
         <div className="hidden lg:flex flex-col gap-2 overflow-y-auto">
           <LayerTogglePanel activeLayers={activeLayers} onToggle={toggleLayer} />
           <PipelineStatus />
         </div>
 
-        {/* CENTER COLUMN */}
+        {/* CENTER COLUMN — no overflow, natural height */}
         <div className="flex flex-col min-h-0 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
-          {/* 1. MAP — fixed 420px */}
-          <div className="shrink-0 h-[420px] relative border-b border-white/5 overflow-hidden">
+          {/* 1. MAP — taller, flex-1 to fill available space */}
+          <div className="shrink-0 min-h-[55vh] relative border-b border-white/5 overflow-hidden">
             <WorldMap
               activeLayers={[]}
               onLayerToggle={() => {}}
               financeMode={true}
               financeLayers={activeLayers}
-              height={420}
+              height={undefined}
             />
           </div>
 
-          {/* 2. LIVE HEADLINES — fixed 180px */}
-          <FinanceLiveNews height={180} />
+          {/* 2. LIVE HEADLINES — auto-scroll, natural height */}
+          <FinanceLiveNews />
 
-          {/* 3. CRYPTO SECTORS + AI TOKENS — side by side */}
-          <div className="shrink-0 grid grid-cols-2 border-b border-white/5" style={{ height: '220px' }}>
+          {/* 3. CRYPTO SECTORS + AI TOKENS — side by side, natural height */}
+          <div className="shrink-0 grid grid-cols-2 border-b border-white/5">
             <CryptoSectors compact />
             <AiTokens compact />
           </div>
         </div>
 
-        {/* RIGHT COLUMN */}
+        {/* RIGHT COLUMN — worldmonitor style panels */}
         <div className="hidden lg:flex flex-col gap-0 overflow-y-auto h-full border-l border-white/5 scrollbar-thin">
+          {/* World Clock — strategic timezones */}
+          <div className="shrink-0 h-[200px] overflow-hidden">
+            <WorldClockPanel />
+          </div>
+
+          {/* Economic Panel — indicators, oil, currency, central banks */}
+          <div className="shrink-0 h-[280px] overflow-hidden">
+            <EconomicPanel />
+          </div>
+
+          {/* News panels */}
           <div className="shrink-0">
-            <NewsPanel category="forex" title="FOREX / ECONOMIC" maxArticles={4} accentColor="cyan" />
+            <NewsPanel category="forex" title="FOREX / ECONOMIC" maxArticles={3} accentColor="cyan" />
           </div>
           <div className="shrink-0">
-            <NewsPanel category="fixed-income" title="FIXED INCOME" maxArticles={4} accentColor="blue" />
+            <NewsPanel category="fixed-income" title="FIXED INCOME" maxArticles={3} accentColor="blue" />
           </div>
           <div className="shrink-0">
             <MetalsMaterials />
