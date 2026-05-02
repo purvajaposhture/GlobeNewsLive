@@ -91,8 +91,6 @@ function performanceForType(type: MissileEvent['type']): Pick<MissileEvent, 'spe
   switch (type) {
     case 'ICBM':
       return { speed: 7000, altitude: 1200, warhead: 'strategic' };
-    case 'MRBM':
-      return { speed: 4200, altitude: 600, warhead: 'conventional' };
     case 'SRBM':
       return { speed: 1800, altitude: 120, warhead: 'conventional' };
     case 'CRUISE':
@@ -101,8 +99,6 @@ function performanceForType(type: MissileEvent['type']): Pick<MissileEvent, 'spe
       return { speed: 180, altitude: 0.12, warhead: 'loitering munition' };
     case 'ARTILLERY':
       return { speed: 900, altitude: 12, warhead: 'high explosive' };
-    case 'INTERCEPTION':
-      return { speed: 3000, altitude: 80, warhead: 'kinetic interceptor' };
     case 'AIRSTRIKE':
     default:
       return { speed: 950, altitude: 10, warhead: 'precision munition' };
@@ -139,12 +135,11 @@ function buildEvent(params: {
     label: params.label,
     description: `${params.type} strike in ${params.region}`,
     severity: params.fatalities > 10 ? 'CRITICAL' : params.fatalities > 5 ? 'HIGH' : 'MEDIUM',
-    status: params.status ?? (params.type === 'INTERCEPTION' ? 'intercepted' : 'active'),
+    status: params.status ?? 'active',
     confidence: params.confidence,
     source: params.source,
     timestamp: params.timestamp,
     region: params.region,
-    fatalities: params.fatalities,
     ...performance,
   };
 }

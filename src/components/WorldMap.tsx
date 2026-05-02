@@ -26,6 +26,21 @@ import {
   getHubsGeoJSON,
   CLUSTER_REGIONS,
 } from "@/lib/trade-routes";
+import {
+  STOCK_EXCHANGES,
+  FINANCIAL_CENTERS,
+  CENTRAL_BANKS,
+  COMMODITY_HUBS,
+  GCC_INVESTMENTS,
+  INTERNET_DISRUPTIONS,
+  WEATHER_ALERTS,
+  ECONOMIC_CENTERS,
+  SANCTIONS_TARGETS,
+  CYBER_THREATS,
+  RESILIENCE_INDEX,
+  NATURAL_EVENTS,
+  DAY_NIGHT_CENTERS,
+} from "@/lib/finance-layers";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -60,33 +75,48 @@ interface Earthquake {
 }
 
 interface WorldMapProps {
-  signals: Signal[];
+  signals?: Signal[];
   activeLayers: string[];
   onLayerToggle: (layer: string) => void;
   earthquakes?: Earthquake[];
+  financeMode?: boolean;
+  financeLayers?: string[];
+  height?: number;
 }
 
 const LAYERS = [
-  { id: "flights", name: "Flights", icon: "✈️", color: "#00ffff" },
-  { id: "routes", name: "Routes", icon: "🔗", color: "#00d4ff" },
-  { id: "conflicts", name: "Conflicts", icon: "⚔️", color: "#ff2244" },
-  { id: "military", name: "Bases", icon: "🎖️", color: "#ff6633" },
-  { id: "chokepoints", name: "Choke", icon: "⚓", color: "#ffaa00" },
-  { id: "earthquakes", name: "Quakes", icon: "🌍", color: "#aa66ff" },
-  { id: "nuclear", name: "Nuclear", icon: "☢️", color: "#ff4444" },
-  { id: "spaceports", name: "Space", icon: "🚀", color: "#8844ff" },
-  { id: "iran", name: "Iran", icon: "🎯", color: "#ff0000" },
+  { id: "clusters", name: "Clusters", icon: "🔴", color: "#ff2244" },
+  { id: "conflicts", name: "Conflicts", icon: "⚔️", color: "#ff6633" },
+  { id: "military", name: "Military", icon: "🎖️", color: "#ffaa00" },
+  { id: "chokepoints", name: "Choke", icon: "⚓", color: "#ffcc00" },
+  { id: "earthquakes", name: "Quakes", icon: "🌋", color: "#ff4400" },
+  { id: "nuclear", name: "Nuclear", icon: "☢️", color: "#ff00ff" },
+  { id: "spaceports", name: "Space", icon: "🚀", color: "#00ccff" },
+  { id: "ai-centers", name: "AI", icon: "🖥️", color: "#00ff88" },
   { id: "cables", name: "Cables", icon: "🔌", color: "#00aaff" },
   { id: "pipelines", name: "Pipes", icon: "🛢️", color: "#ff8800" },
-  { id: "ai-centers", name: "AI", icon: "🖥️", color: "#00ff88" },
-  { id: "fires", name: "Fires", icon: "🔥", color: "#ff4400" },
-  { id: "gps-jamming", name: "GPS", icon: "📡", color: "#ff00ff" },
-  { id: "outages", name: "Net", icon: "🌐", color: "#666666" },
-  { id: "cyber", name: "Cyber", icon: "💻", color: "#00ffff" },
-  { id: "weather", name: "Wx", icon: "🌪️", color: "#00ccff" },
-  { id: "displacement", name: "Refugees", icon: "🏃", color: "#ff6699" },
-  { id: "clusters", name: "Clusters", icon: "📍", color: "#ffdd00" },
+  { id: "trade-routes", name: "Trade", icon: "🚢", color: "#ffcc00" },
   { id: "ports", name: "Ports", icon: "⚓", color: "#00ccff" },
+  { id: "flights", name: "Flights", icon: "✈️", color: "#00ccff" },
+  { id: "gps-jamming", name: "GPS", icon: "📡", color: "#ff00ff" },
+];
+
+const FINANCE_LAYERS_META = [
+  { id: "exchanges", name: "Exchanges", icon: "📈", color: "#00ff88" },
+  { id: "centers", name: "Centers", icon: "🏦", color: "#00aaff" },
+  { id: "banks", name: "Banks", icon: "🏛️", color: "#ffaa00" },
+  { id: "hubs", name: "Hubs", icon: "⚡", color: "#ff8800" },
+  { id: "gcc", name: "GCC", icon: "💰", color: "#00ffaa" },
+  { id: "cables", name: "Cables", icon: "🔌", color: "#00aaff" },
+  { id: "pipelines", name: "Pipes", icon: "🛢️", color: "#ff8800" },
+  { id: "internet", name: "Internet", icon: "🔌", color: "#ff2244" },
+  { id: "weather", name: "Weather", icon: "🌪️", color: "#ffaa00" },
+  { id: "economic", name: "Economic", icon: "🏭", color: "#aa44ff" },
+  { id: "sanctions", name: "Sanctions", icon: "🚫", color: "#ff2244" },
+  { id: "cyber", name: "Cyber", icon: "💻", color: "#ff00ff" },
+  { id: "resilience", name: "Resilience", icon: "🛡️", color: "#00ff88" },
+  { id: "natural", name: "Natural", icon: "🌋", color: "#ff6633" },
+  { id: "daynight", name: "Day/Night", icon: "🌐", color: "#00ccff" },
   { id: "trade-routes", name: "Trade", icon: "🚢", color: "#ffcc00" },
 ];
 
@@ -236,10 +266,13 @@ function calculateClusters(
 }
 
 export default function WorldMap({
-  signals,
+  signals = [],
   activeLayers,
   onLayerToggle,
   earthquakes = [],
+  financeMode = false,
+  financeLayers = [],
+  height,
 }: WorldMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
@@ -1057,6 +1090,221 @@ export default function WorldMap({
       });
     }
 
+    // FINANCE MODE LAYERS — emoji markers (original style)
+    if (financeMode) {
+      if (financeLayers.includes("exchanges")) {
+        STOCK_EXCHANGES.forEach((ex) => {
+          const el = createMarkerElement("📈", "#00ff88", ex.name, 0.8);
+          const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([ex.lon, ex.lat])
+            .setPopup(
+              new maplibregl.Popup({ offset: 25, className: "dark-popup" })
+                .setHTML(`<div class="text-white"><strong>📈 ${ex.name}</strong><br/>
+                <span class="text-xs">${ex.country} • ${ex.type}</span><br/>
+                <span class="text-xs text-gray-400">${ex.description}</span></div>`),
+            )
+            .addTo(map.current!);
+          markersRef.current.push(marker);
+        });
+      }
+
+      if (financeLayers.includes("centers")) {
+        FINANCIAL_CENTERS.forEach((fc) => {
+          const el = createMarkerElement("🏦", "#00aaff", fc.name, 0.8);
+          const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([fc.lon, fc.lat])
+            .setPopup(
+              new maplibregl.Popup({ offset: 25, className: "dark-popup" })
+                .setHTML(`<div class="text-white"><strong>🏦 ${fc.name}</strong><br/>
+                <span class="text-xs">${fc.country} • ${fc.type}</span><br/>
+                <span class="text-xs text-gray-400">${fc.description}</span></div>`),
+            )
+            .addTo(map.current!);
+          markersRef.current.push(marker);
+        });
+      }
+
+      if (financeLayers.includes("banks")) {
+        CENTRAL_BANKS.forEach((bank) => {
+          const el = createMarkerElement("🏛️", "#ffaa00", bank.name, 0.8);
+          const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([bank.lon, bank.lat])
+            .setPopup(
+              new maplibregl.Popup({ offset: 25, className: "dark-popup" })
+                .setHTML(`<div class="text-white"><strong>🏛️ ${bank.name}</strong><br/>
+                <span class="text-xs">${bank.country} • ${bank.type}</span><br/>
+                <span class="text-xs text-gray-400">${bank.description}</span></div>`),
+            )
+            .addTo(map.current!);
+          markersRef.current.push(marker);
+        });
+      }
+
+      if (financeLayers.includes("hubs")) {
+        COMMODITY_HUBS.forEach((hub) => {
+          const el = createMarkerElement("⚡", "#ff8800", hub.name, 0.8);
+          const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([hub.lon, hub.lat])
+            .setPopup(
+              new maplibregl.Popup({ offset: 25, className: "dark-popup" })
+                .setHTML(`<div class="text-white"><strong>⚡ ${hub.name}</strong><br/>
+                <span class="text-xs">${hub.country} • ${hub.type}</span><br/>
+                <span class="text-xs text-gray-400">${hub.description}</span></div>`),
+            )
+            .addTo(map.current!);
+          markersRef.current.push(marker);
+        });
+      }
+
+      if (financeLayers.includes("gcc")) {
+        GCC_INVESTMENTS.forEach((gcc) => {
+          const el = createMarkerElement("💰", "#00ffaa", gcc.name, 0.8);
+          const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([gcc.lon, gcc.lat])
+            .setPopup(
+              new maplibregl.Popup({ offset: 25, className: "dark-popup" })
+                .setHTML(`<div class="text-white"><strong>💰 ${gcc.name}</strong><br/>
+                <span class="text-xs">${gcc.country} • ${gcc.type}</span><br/>
+                <span class="text-xs text-gray-400">${gcc.description}</span></div>`),
+            )
+            .addTo(map.current!);
+          markersRef.current.push(marker);
+        });
+      }
+
+      if (financeLayers.includes("internet")) {
+        INTERNET_DISRUPTIONS.forEach((net) => {
+          const color = net.status === "active" ? "#ff2244" : "#ffaa00";
+          const el = createMarkerElement("🔌", color, net.name, 0.8);
+          const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([net.lon, net.lat])
+            .setPopup(
+              new maplibregl.Popup({ offset: 25, className: "dark-popup" })
+                .setHTML(`<div class="text-white"><strong>🔌 ${net.name}</strong><br/>
+                <span class="text-xs">${net.country} • ${net.type}</span><br/>
+                <span class="text-xs text-gray-400">${net.description}</span></div>`),
+            )
+            .addTo(map.current!);
+          markersRef.current.push(marker);
+        });
+      }
+
+      if (financeLayers.includes("weather")) {
+        WEATHER_ALERTS.forEach((w) => {
+          const color = w.status === "warning" ? "#ffaa00" : "#00aaff";
+          const el = createMarkerElement("🌪️", color, w.name, 0.8);
+          const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([w.lon, w.lat])
+            .setPopup(
+              new maplibregl.Popup({ offset: 25, className: "dark-popup" })
+                .setHTML(`<div class="text-white"><strong>🌪️ ${w.name}</strong><br/>
+                <span class="text-xs">${w.country} • ${w.type}</span><br/>
+                <span class="text-xs text-gray-400">${w.description}</span></div>`),
+            )
+            .addTo(map.current!);
+          markersRef.current.push(marker);
+        });
+      }
+
+      if (financeLayers.includes("economic")) {
+        ECONOMIC_CENTERS.forEach((ec) => {
+          const el = createMarkerElement("🏭", "#aa44ff", ec.name, 0.8);
+          const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([ec.lon, ec.lat])
+            .setPopup(
+              new maplibregl.Popup({ offset: 25, className: "dark-popup" })
+                .setHTML(`<div class="text-white"><strong>🏭 ${ec.name}</strong><br/>
+                <span class="text-xs">${ec.country} • ${ec.type}</span><br/>
+                <span class="text-xs text-gray-400">${ec.description}</span></div>`),
+            )
+            .addTo(map.current!);
+          markersRef.current.push(marker);
+        });
+      }
+
+      if (financeLayers.includes("sanctions")) {
+        SANCTIONS_TARGETS.forEach((st) => {
+          const el = createMarkerElement("🚫", "#ff2244", st.name, 0.8);
+          const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([st.lon, st.lat])
+            .setPopup(
+              new maplibregl.Popup({ offset: 25, className: "dark-popup" })
+                .setHTML(`<div class="text-white"><strong>🚫 ${st.name}</strong><br/>
+                <span class="text-xs">${st.country} • ${st.type}</span><br/>
+                <span class="text-xs text-gray-400">${st.description}</span></div>`),
+            )
+            .addTo(map.current!);
+          markersRef.current.push(marker);
+        });
+      }
+
+      if (financeLayers.includes("cyber")) {
+        CYBER_THREATS.forEach((ct) => {
+          const color = ct.status === "active" ? "#ff00ff" : "#aa44ff";
+          const el = createMarkerElement("💻", color, ct.name, 0.8);
+          const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([ct.lon, ct.lat])
+            .setPopup(
+              new maplibregl.Popup({ offset: 25, className: "dark-popup" })
+                .setHTML(`<div class="text-white"><strong>💻 ${ct.name}</strong><br/>
+                <span class="text-xs">${ct.country} • ${ct.type}</span><br/>
+                <span class="text-xs text-gray-400">${ct.description}</span></div>`),
+            )
+            .addTo(map.current!);
+          markersRef.current.push(marker);
+        });
+      }
+
+      if (financeLayers.includes("resilience")) {
+        RESILIENCE_INDEX.forEach((ri) => {
+          const color = ri.description.includes("HIGH") ? "#00ff88" : ri.description.includes("MEDIUM") ? "#ffaa00" : "#ff2244";
+          const el = createMarkerElement("🛡️", color, ri.name, 0.8);
+          const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([ri.lon, ri.lat])
+            .setPopup(
+              new maplibregl.Popup({ offset: 25, className: "dark-popup" })
+                .setHTML(`<div class="text-white"><strong>🛡️ ${ri.name}</strong><br/>
+                <span class="text-xs">${ri.country} • ${ri.type}</span><br/>
+                <span class="text-xs text-gray-400">${ri.description}</span></div>`),
+            )
+            .addTo(map.current!);
+          markersRef.current.push(marker);
+        });
+      }
+
+      if (financeLayers.includes("natural")) {
+        NATURAL_EVENTS.forEach((ne) => {
+          const el = createMarkerElement("🌋", "#ff6633", ne.name, 0.8);
+          const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([ne.lon, ne.lat])
+            .setPopup(
+              new maplibregl.Popup({ offset: 25, className: "dark-popup" })
+                .setHTML(`<div class="text-white"><strong>🌋 ${ne.name}</strong><br/>
+                <span class="text-xs">${ne.country} • ${ne.type}</span><br/>
+                <span class="text-xs text-gray-400">${ne.description}</span></div>`),
+            )
+            .addTo(map.current!);
+          markersRef.current.push(marker);
+        });
+      }
+
+      if (financeLayers.includes("daynight")) {
+        DAY_NIGHT_CENTERS.forEach((dn) => {
+          const el = createMarkerElement("🌐", "#00ccff", dn.name, 0.8);
+          const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([dn.lon, dn.lat])
+            .setPopup(
+              new maplibregl.Popup({ offset: 25, className: "dark-popup" })
+                .setHTML(`<div class="text-white"><strong>🌐 ${dn.name}</strong><br/>
+                <span class="text-xs">${dn.country} • ${dn.type}</span><br/>
+                <span class="text-xs text-gray-400">${dn.description}</span></div>`),
+            )
+            .addTo(map.current!);
+          markersRef.current.push(marker);
+        });
+      }
+    }
+
     // GPS Jamming zones
     if (activeLayers.includes("gps-jamming")) {
       const GPS_JAMMING_ZONES = [
@@ -1229,7 +1477,7 @@ export default function WorldMap({
         markersRef.current.push(marker);
       });
     }
-  }, [signals, activeLayers, loaded, earthquakes, clusters]);
+  }, [signals, activeLayers, loaded, earthquakes, clusters, financeMode, financeLayers]);
 
   return (
     <div className="glass-panel h-full flex flex-col relative">
@@ -1241,7 +1489,9 @@ export default function WorldMap({
             WORLD MAP
           </span>
           <span className="text-[9px] text-text-dim font-mono">
-            {LAYERS.filter((l) => activeLayers.includes(l.id)).length} layers
+            {financeMode
+              ? `${financeLayers?.length || 0} layers`
+              : `${LAYERS.filter((l) => activeLayers.includes(l.id)).length} layers`}
           </span>
           {activeLayers.includes("flights") && flights.length > 0 && (
             <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400 font-mono animate-pulse">
@@ -1263,17 +1513,17 @@ export default function WorldMap({
       {layerPanelOpen && (
         <div className="absolute top-12 right-2 z-20 bg-void/95 backdrop-blur-sm border border-border-subtle rounded-lg p-2 shadow-xl max-h-80 overflow-y-auto">
           <div className="grid grid-cols-3 gap-1">
-            {LAYERS.map((layer) => (
+            {(financeMode ? FINANCE_LAYERS_META : LAYERS).map((layer) => (
               <button
                 key={layer.id}
-                onClick={() => onLayerToggle(layer.id)}
+                onClick={() => financeMode ? onLayerToggle(layer.id) : onLayerToggle(layer.id)}
                 className={`px-2 py-1.5 rounded text-[9px] font-mono transition-all flex items-center gap-1 ${
-                  activeLayers.includes(layer.id)
+                  (financeMode ? financeLayers : activeLayers).includes(layer.id)
                     ? "bg-white/10 text-white"
                     : "text-text-dim hover:text-text-muted hover:bg-white/5"
                 }`}
                 style={
-                  activeLayers.includes(layer.id)
+                  (financeMode ? financeLayers : activeLayers).includes(layer.id)
                     ? { borderLeft: `2px solid ${layer.color}` }
                     : {}
                 }
@@ -1324,20 +1574,22 @@ export default function WorldMap({
         <div className="text-text-muted font-mono mb-1 flex items-center justify-between">
           <span>LAYERS</span>
           <span className="text-[8px] text-text-dim">
-            {activeLayers.length} active
+            {financeMode ? (financeLayers?.length || 0) : activeLayers.length} active
           </span>
         </div>
         <div className="flex flex-wrap gap-1">
-          {LAYERS.filter((l) => activeLayers.includes(l.id)).map((layer) => (
-            <div
-              key={layer.id}
-              className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5"
-              style={{ borderLeft: `2px solid ${layer.color}` }}
-            >
-              <span>{layer.icon}</span>
-              <span className="text-text-muted">{layer.name}</span>
-            </div>
-          ))}
+          {(financeMode ? FINANCE_LAYERS_META : LAYERS)
+            .filter((l) => (financeMode ? financeLayers : activeLayers).includes(l.id))
+            .map((layer) => (
+              <div
+                key={layer.id}
+                className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5"
+                style={{ borderLeft: `2px solid ${layer.color}` }}
+              >
+                <span>{layer.icon}</span>
+                <span className="text-text-muted">{layer.name}</span>
+              </div>
+            ))}
         </div>
       </div>
 
@@ -1380,3 +1632,4 @@ function createMarkerElement(
   el.title = title;
   return el;
 }
+

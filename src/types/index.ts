@@ -67,15 +67,6 @@ export interface CountryRisk {
 
 export type ThreatLevel = 'LOW' | 'GUARDED' | 'ELEVATED' | 'HIGH' | 'SEVERE';
 
-export interface DashboardState {
-  threatLevel: ThreatLevel;
-  activeConflicts: number;
-  militaryAlerts: number;
-  lastUpdate: Date;
-  timeFilter: '1h' | '6h' | '24h' | '48h' | '7d';
-  activeLayers: string[];
-}
-
 export interface MissileEvent {
   id: string;
   type: 'DRONE' | 'AIRSTRIKE' | 'ARTILLERY' | 'SRBM' | 'CRUISE' | 'MISSILE' | 'ROCKET' | 'INTERCEPTION' | 'ICBM' | 'MRBM' | 'MLRS';

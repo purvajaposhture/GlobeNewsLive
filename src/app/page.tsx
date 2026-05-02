@@ -75,6 +75,11 @@ const WarRoom = dynamic(() => import('@/components/WarRoom'), {
   loading: () => <div className="h-screen flex items-center justify-center bg-void"><div className="text-accent-green animate-pulse font-mono">Loading War Room...</div></div>
 });
 
+const FinanceDashboardFull = dynamic(() => import('@/components/finance/FinanceDashboardFull'), {
+  ssr: false,
+  loading: () => <div className="h-screen flex items-center justify-center bg-void"><div className="text-accent-green animate-pulse font-mono">Loading Finance Dashboard...</div></div>
+});
+
 const fetcher = async (url: string) => {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`API error: ${res.status}`);
@@ -101,7 +106,7 @@ function playAlertSound() {
   }
 }
 
-type ViewMode = 'dashboard' | 'warroom' | 'mapfocus';
+type ViewMode = 'dashboard' | 'warroom' | 'mapfocus' | 'finance';
 type MobileView = 'feed' | 'map' | 'markets' | 'tracking' | 'alerts';
 
 export default function Dashboard() {
@@ -431,6 +436,46 @@ export default function Dashboard() {
     );
   }
 
+  // Finance View
+  if (viewMode === 'finance') {
+    return (
+      <div className="h-screen flex flex-col bg-void">
+        {/* Mode Toggle */}
+        <div className="bg-void border-b border-border-default px-4 py-1.5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setViewMode('dashboard')}
+              className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
+            >
+              📊 DASHBOARD
+            </button>
+            <button
+              onClick={() => setViewMode('warroom')}
+              className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
+            >
+              ⚔️ WAR ROOM
+            </button>
+            <button
+              onClick={() => setViewMode('finance')}
+              className="px-3 py-1 rounded text-[10px] font-mono bg-accent-gold/20 text-accent-gold"
+            >
+              💰 FINANCE
+            </button>
+          </div>
+          <button
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded text-[9px] font-mono ${soundEnabled ? 'bg-accent-green/20 text-accent-green' : 'bg-elevated text-text-dim'}`}
+          >
+            {soundEnabled ? '🔔' : '🔕'} ALERTS
+          </button>
+        </div>
+        <div className="flex-1 overflow-hidden">
+          <FinanceDashboardFull />
+        </div>
+      </div>
+    );
+  }
+
   // Dashboard View
   return (
     <div className={`h-screen flex flex-col bg-void overflow-hidden ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
@@ -484,6 +529,12 @@ export default function Dashboard() {
             className='px-3 py-1 rounded text-[10px] font-mono text-accent-blue bg-accent-blue/10 hover:bg-accent-blue/20 transition-all'
           >
             🗺️ MAP FOCUS
+          </button>
+          <button
+            onClick={() => setViewMode('finance')}
+            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white hover:bg-white/5"
+          >
+            💰 FINANCE
           </button>
         </div>
         <div className="flex items-center gap-3">
