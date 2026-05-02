@@ -78,7 +78,7 @@ function jitter(value: number, seed: number, scale: number): number {
 
 function classifyType(text: string): MissileEvent['type'] {
   const value = text.toLowerCase();
-  if (value.includes('intercept')) return 'HYPERSONIC';
+  if (value.includes('intercept')) return 'INTERCEPTION';
   if (value.includes('drone') || value.includes('uav')) return 'DRONE';
   if (value.includes('air')) return 'AIRSTRIKE';
   if (value.includes('shell') || value.includes('artillery')) return 'ARTILLERY';
@@ -135,10 +135,10 @@ function buildEvent(params: {
     label: params.label,
     description: `${params.type} strike in ${params.region}`,
     severity: params.fatalities > 10 ? 'CRITICAL' : params.fatalities > 5 ? 'HIGH' : 'MEDIUM',
-    status: params.status ?? (params.type === 'INTERCEPTION' ? 'intercepted' : 'active'),
+    status: params.status ?? 'active',
     confidence: params.confidence,
     source: params.source,
-    timestamp: new Date(params.timestamp),
+    timestamp: params.timestamp,
     region: params.region,
     ...performance,
   };
