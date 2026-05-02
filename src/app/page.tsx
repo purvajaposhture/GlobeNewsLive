@@ -57,7 +57,15 @@ import TVMode from '@/components/TVMode';
 import RSSTicker from '@/components/RSSTicker';
 import HelpPin from '@/components/HelpPin';
 import PortStatusPanel from '@/components/PortStatusPanel';
-import { Signal, MarketData, PredictionMarket, ThreatLevel } from '@/types';
+import GlobalSituationHeader from '@/components/GlobalSituationHeader';
+import TimeRangeSelector, { TimeRange } from '@/components/TimeRangeSelector';
+import RegionSelector, { Region } from '@/components/RegionSelector';
+import CategoryFilterBar from '@/components/CategoryFilterBar';
+import ActivityWaterfall from '@/components/ActivityWaterfall';
+import FeedPipelineMonitor from '@/components/FeedPipelineMonitor';
+import EnhancedMapControls from '@/components/EnhancedMapControls';
+import LiveNewsTicker from '@/components/LiveNewsTicker';
+import { Signal, MarketData, PredictionMarket, ThreatLevel, SignalCategory } from '@/types';
 import { getThreatLevelFromSignals } from '@/lib/classify';
 import { ACTIVE_CONFLICTS } from '@/lib/feeds';
 
@@ -114,6 +122,13 @@ export default function Dashboard() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [tvMode, setTvMode] = useState(false);
   const [videoWallOpen, setVideoWallOpen] = useState(false);
+  
+  // New feature states
+  const [timeRange, setTimeRange] = useState<TimeRange>('24h');
+  const [activeRegion, setActiveRegion] = useState<Region>('global');
+  const [activeCategories, setActiveCategories] = useState<SignalCategory[]>([
+    'conflict', 'military', 'diplomacy', 'cyber', 'disaster', 'economy', 'politics', 'terrorism', 'protest', 'infrastructure'
+  ]);
   
   // Multi-language support
   const { language, changeLanguage, isRTL } = useLanguage();
@@ -223,6 +238,15 @@ export default function Dashboard() {
   const handleSignalClick = useCallback((signal: Signal) => {
     if (signal.sourceUrl) window.open(signal.sourceUrl, '_blank', 'noopener,noreferrer');
   }, []);
+
+  const handleCategoryToggle = useCallback((category: SignalCategory) => {
+    setActiveCategories(prev =>
+      prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]
+    );
+  }, []);
+
+  // Filter signals by active categories
+  const filteredSignals = signals.filter(s => activeCategories.includes(s.category));
 
   // Skeleton loading - show immediate value while hydrating
   if (!isClient) {
@@ -497,29 +521,61 @@ export default function Dashboard() {
         onThemeToggle={toggleTheme}
       />
 
-      {/* Desktop Layout — WorldMonitor-style with sidebar */}
+      {/* NEW: Global Situation Header */}
+      <GlobalSituationHeader 
+        threatLevel={threatLevel} 
+        signals={signals} 
+        activeConflicts={ACTIVE_CONFLICTS.length} 
+        lastUpdate={lastUpdate} 
+      />
+
+      {/* NEW: Control Bars */}
+      <div className="hidden lg:flex items-center gap-2 px-4 py-1.5 bg-void border-b border-border-default overflow-x-auto">
+        <TimeRangeSelector value={timeRange} onChange={setTimeRange} />
+        <RegionSelector value={activeRegion} onChange={setActiveRegion} />
+        <div className="flex-1 min-w-0">
+          <CategoryFilterBar active={activeCategories} onToggle={handleCategoryToggle} />
+        </div>
+      </div>
+
+      {/* Desktop Layout — WorldMonitor-style with sidebar + PR24 enhancements */}
       <div className="hidden lg:flex flex-1 overflow-hidden">
         <WorldMonitorLayout signals={signals} activeLayers={activeLayers} onLayerToggle={handleLayerToggle} defcon={3} criticalCount={criticalCount}>
-        <CustomDashboard
-          signals={signals}
-          markets={markets}
-          earthquakes={earthquakes}
-          conflicts={conflicts}
-          signalsLoading={signalsLoading || signalsValidating}
-          marketsLoading={marketsLoading || marketsValidating}
-          activeLayers={activeLayers}
-          onLayerToggle={handleLayerToggle}
-          onSignalClick={handleSignalClick}
-          isBookmarked={isBookmarked}
-          onBookmark={toggleBookmark}
-        />
+          <CustomDashboard
+            signals={filteredSignals}
+            markets={markets}
+            earthquakes={earthquakes}
+            conflicts={conflicts}
+            signalsLoading={signalsLoading || signalsValidating}
+            marketsLoading={marketsLoading || marketsValidating}
+            activeLayers={activeLayers}
+            onLayerToggle={handleLayerToggle}
+            onSignalClick={handleSignalClick}
+            isBookmarked={isBookmarked}
+            onBookmark={toggleBookmark}
+          />
         </WorldMonitorLayout>
+        {/* NEW: Right Sidebar Widgets */}
+        <aside className="w-[280px] border-l border-border-default bg-void overflow-y-auto p-2 space-y-2 hidden xl:block">
+          <ActivityWaterfall signals={filteredSignals} maxItems={12} />
+          <FeedPipelineMonitor />
+        </aside>
+      </div>
+
+      {/* NEW: Floating Map Controls (Desktop overlay) */}
+      <div className="hidden lg:block absolute top-[140px] right-[300px] z-10">
+        <EnhancedMapControls activeLayers={activeLayers} onLayerToggle={handleLayerToggle} />
       </div>
 
       {/* Mobile Layout */}
       <main className="lg:hidden flex-1 overflow-hidden pb-20">
         {mobileView === 'feed' && <SignalFeed signals={signals} loading={signalsLoading || signalsValidating} onSignalClick={handleSignalClick} />}
-        {mobileView === 'map' && <div className="h-full p-2"><WorldMap signals={signals} activeLayers={activeLayers} onLayerToggle={handleLayerToggle} earthquakes={earthquakes} /></div>}
+        {mobileView === 'map' && (
+          <div className="h-full p-2 relative">
+            <WorldMap signals={signals} activeLayers={activeLayers} onLayerToggle={handleLayerToggle} earthquakes={earthquakes} />
+            <EnhancedMapControls activeLayers={activeLayers} onLayerToggle={handleLayerToggle} />
+          </div>
+        )}
         {mobileView === 'markets' && (
           <div className="h-full overflow-y-auto p-2 space-y-2">
             <SituationBrief />
@@ -608,6 +664,9 @@ export default function Dashboard() {
       </div>
       {/* Help Pin - Floating help button */}
       <HelpPin />
+
+      {/* NEW: Live News Ticker */}
+      <LiveNewsTicker signals={signals} />
     </div>
   );
 }
