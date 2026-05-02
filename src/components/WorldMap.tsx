@@ -85,26 +85,38 @@ interface WorldMapProps {
 }
 
 const LAYERS = [
-  { id: "flights", name: "Flights", icon: "✈️", color: "#00ffff" },
-  { id: "routes", name: "Routes", icon: "🔗", color: "#00d4ff" },
-  { id: "conflicts", name: "Conflicts", icon: "⚔️", color: "#ff2244" },
-  { id: "military", name: "Bases", icon: "🎖️", color: "#ff6633" },
-  { id: "chokepoints", name: "Choke", icon: "⚓", color: "#ffaa00" },
-  { id: "earthquakes", name: "Quakes", icon: "🌍", color: "#aa66ff" },
-  { id: "nuclear", name: "Nuclear", icon: "☢️", color: "#ff4444" },
-  { id: "spaceports", name: "Space", icon: "🚀", color: "#8844ff" },
-  { id: "iran", name: "Iran", icon: "🎯", color: "#ff0000" },
+  { id: "clusters", name: "Clusters", icon: "🔴", color: "#ff2244" },
+  { id: "conflicts", name: "Conflicts", icon: "⚔️", color: "#ff6633" },
+  { id: "military", name: "Military", icon: "🎖️", color: "#ffaa00" },
+  { id: "chokepoints", name: "Choke", icon: "⚓", color: "#ffcc00" },
+  { id: "earthquakes", name: "Quakes", icon: "🌋", color: "#ff4400" },
+  { id: "nuclear", name: "Nuclear", icon: "☢️", color: "#ff00ff" },
+  { id: "spaceports", name: "Space", icon: "🚀", color: "#00ccff" },
+  { id: "ai-centers", name: "AI", icon: "🖥️", color: "#00ff88" },
   { id: "cables", name: "Cables", icon: "🔌", color: "#00aaff" },
   { id: "pipelines", name: "Pipes", icon: "🛢️", color: "#ff8800" },
-  { id: "ai-centers", name: "AI", icon: "🖥️", color: "#00ff88" },
-  { id: "fires", name: "Fires", icon: "🔥", color: "#ff4400" },
-  { id: "gps-jamming", name: "GPS", icon: "📡", color: "#ff00ff" },
-  { id: "outages", name: "Net", icon: "🌐", color: "#666666" },
-  { id: "cyber", name: "Cyber", icon: "💻", color: "#00ffff" },
-  { id: "weather", name: "Wx", icon: "🌪️", color: "#00ccff" },
-  { id: "displacement", name: "Refugees", icon: "🏃", color: "#ff6699" },
-  { id: "clusters", name: "Clusters", icon: "📍", color: "#ffdd00" },
+  { id: "trade-routes", name: "Trade", icon: "🚢", color: "#ffcc00" },
   { id: "ports", name: "Ports", icon: "⚓", color: "#00ccff" },
+  { id: "flights", name: "Flights", icon: "✈️", color: "#00ccff" },
+  { id: "gps-jamming", name: "GPS", icon: "📡", color: "#ff00ff" },
+];
+
+const FINANCE_LAYERS_META = [
+  { id: "exchanges", name: "Exchanges", icon: "📈", color: "#00ff88" },
+  { id: "centers", name: "Centers", icon: "🏦", color: "#00aaff" },
+  { id: "banks", name: "Banks", icon: "🏛️", color: "#ffaa00" },
+  { id: "hubs", name: "Hubs", icon: "⚡", color: "#ff8800" },
+  { id: "gcc", name: "GCC", icon: "💰", color: "#00ffaa" },
+  { id: "cables", name: "Cables", icon: "🔌", color: "#00aaff" },
+  { id: "pipelines", name: "Pipes", icon: "🛢️", color: "#ff8800" },
+  { id: "internet", name: "Internet", icon: "🔌", color: "#ff2244" },
+  { id: "weather", name: "Weather", icon: "🌪️", color: "#ffaa00" },
+  { id: "economic", name: "Economic", icon: "🏭", color: "#aa44ff" },
+  { id: "sanctions", name: "Sanctions", icon: "🚫", color: "#ff2244" },
+  { id: "cyber", name: "Cyber", icon: "💻", color: "#ff00ff" },
+  { id: "resilience", name: "Resilience", icon: "🛡️", color: "#00ff88" },
+  { id: "natural", name: "Natural", icon: "🌋", color: "#ff6633" },
+  { id: "daynight", name: "Day/Night", icon: "🌐", color: "#00ccff" },
   { id: "trade-routes", name: "Trade", icon: "🚢", color: "#ffcc00" },
 ];
 
@@ -1490,7 +1502,9 @@ export default function WorldMap({
             WORLD MAP
           </span>
           <span className="text-[9px] text-text-dim font-mono">
-            {LAYERS.filter((l) => activeLayers.includes(l.id)).length} layers
+            {financeMode
+              ? `${financeLayers?.length || 0} layers`
+              : `${LAYERS.filter((l) => activeLayers.includes(l.id)).length} layers`}
           </span>
           {activeLayers.includes("flights") && flights.length > 0 && (
             <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400 font-mono animate-pulse">
@@ -1512,17 +1526,17 @@ export default function WorldMap({
       {layerPanelOpen && (
         <div className="absolute top-12 right-2 z-20 bg-void/95 backdrop-blur-sm border border-border-subtle rounded-lg p-2 shadow-xl max-h-80 overflow-y-auto">
           <div className="grid grid-cols-3 gap-1">
-            {LAYERS.map((layer) => (
+            {(financeMode ? FINANCE_LAYERS_META : LAYERS).map((layer) => (
               <button
                 key={layer.id}
-                onClick={() => onLayerToggle(layer.id)}
+                onClick={() => financeMode ? onLayerToggle(layer.id) : onLayerToggle(layer.id)}
                 className={`px-2 py-1.5 rounded text-[9px] font-mono transition-all flex items-center gap-1 ${
-                  activeLayers.includes(layer.id)
+                  (financeMode ? financeLayers : activeLayers).includes(layer.id)
                     ? "bg-white/10 text-white"
                     : "text-text-dim hover:text-text-muted hover:bg-white/5"
                 }`}
                 style={
-                  activeLayers.includes(layer.id)
+                  (financeMode ? financeLayers : activeLayers).includes(layer.id)
                     ? { borderLeft: `2px solid ${layer.color}` }
                     : {}
                 }
@@ -1573,20 +1587,22 @@ export default function WorldMap({
         <div className="text-text-muted font-mono mb-1 flex items-center justify-between">
           <span>LAYERS</span>
           <span className="text-[8px] text-text-dim">
-            {activeLayers.length} active
+            {financeMode ? (financeLayers?.length || 0) : activeLayers.length} active
           </span>
         </div>
         <div className="flex flex-wrap gap-1">
-          {LAYERS.filter((l) => activeLayers.includes(l.id)).map((layer) => (
-            <div
-              key={layer.id}
-              className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5"
-              style={{ borderLeft: `2px solid ${layer.color}` }}
-            >
-              <span>{layer.icon}</span>
-              <span className="text-text-muted">{layer.name}</span>
-            </div>
-          ))}
+          {(financeMode ? FINANCE_LAYERS_META : LAYERS)
+            .filter((l) => (financeMode ? financeLayers : activeLayers).includes(l.id))
+            .map((layer) => (
+              <div
+                key={layer.id}
+                className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5"
+                style={{ borderLeft: `2px solid ${layer.color}` }}
+              >
+                <span>{layer.icon}</span>
+                <span className="text-text-muted">{layer.name}</span>
+              </div>
+            ))}
         </div>
       </div>
 
