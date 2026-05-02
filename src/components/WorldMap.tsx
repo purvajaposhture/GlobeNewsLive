@@ -1486,45 +1486,74 @@ function createDotMarkerElement(
 ): HTMLElement {
   const el = document.createElement("div");
   el.className = "relative cursor-pointer flex items-center justify-center";
-  el.style.cssText = `width: ${size}px; height: ${size}px;`;
+  el.style.cssText = `width: ${size * 4}px; height: ${size * 4}px;`;
   el.title = title;
 
-  // Inner dot
+  // Outer soft glow halo
+  const halo = document.createElement("div");
+  halo.style.cssText = `
+    position: absolute;
+    width: ${size * 3}px;
+    height: ${size * 3}px;
+    border-radius: 50%;
+    background: radial-gradient(circle, ${color}40 0%, ${color}15 40%, transparent 70%);
+    pointer-events: none;
+    transition: all 0.2s ease;
+  `;
+
+  // Middle ring
+  const ring = document.createElement("div");
+  ring.style.cssText = `
+    position: absolute;
+    width: ${size * 1.8}px;
+    height: ${size * 1.8}px;
+    border-radius: 50%;
+    border: 1.5px solid ${color}90;
+    background: ${color}20;
+    pointer-events: none;
+    transition: all 0.2s ease;
+  `;
+
+  // Inner solid dot
   const dot = document.createElement("div");
   dot.style.cssText = `
+    position: absolute;
     width: ${size}px;
     height: ${size}px;
     border-radius: 50%;
     background: ${color};
-    border: 1.5px solid ${color}88;
-    box-shadow: 0 0 6px ${color}80, 0 0 12px ${color}40;
-    transition: transform 0.2s ease;
+    box-shadow: 0 0 4px ${color}, 0 0 8px ${color}80;
+    pointer-events: none;
+    transition: all 0.2s ease;
   `;
 
-  // Optional pulse ring
+  // Optional pulse animation on the halo
   if (pulse) {
-    const ring = document.createElement("div");
-    ring.style.cssText = `
-      position: absolute;
-      inset: -4px;
-      border-radius: 50%;
-      border: 1px solid ${color}60;
-      animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-      pointer-events: none;
-    `;
-    el.appendChild(ring);
+    halo.style.animation = "ping 2.5s cubic-bezier(0, 0, 0.2, 1) infinite";
   }
 
+  el.appendChild(halo);
+  el.appendChild(ring);
   el.appendChild(dot);
 
-  // Hover effect
+  // Hover effect - everything scales up and glows brighter
   el.addEventListener("mouseenter", () => {
-    dot.style.transform = "scale(1.4)";
-    dot.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}80`;
+    halo.style.transform = "scale(1.5)";
+    halo.style.background = `radial-gradient(circle, ${color}60 0%, ${color}30 40%, transparent 70%)`;
+    ring.style.transform = "scale(1.3)";
+    ring.style.borderColor = color;
+    ring.style.background = `${color}40`;
+    dot.style.transform = "scale(1.3)";
+    dot.style.boxShadow = `0 0 8px ${color}, 0 0 16px ${color}, 0 0 24px ${color}60`;
   });
   el.addEventListener("mouseleave", () => {
+    halo.style.transform = "scale(1)";
+    halo.style.background = `radial-gradient(circle, ${color}40 0%, ${color}15 40%, transparent 70%)`;
+    ring.style.transform = "scale(1)";
+    ring.style.borderColor = `${color}90`;
+    ring.style.background = `${color}20`;
     dot.style.transform = "scale(1)";
-    dot.style.boxShadow = `0 0 6px ${color}80, 0 0 12px ${color}40`;
+    dot.style.boxShadow = `0 0 4px ${color}, 0 0 8px ${color}80`;
   });
 
   return el;
