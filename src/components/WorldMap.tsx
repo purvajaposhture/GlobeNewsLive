@@ -60,10 +60,13 @@ interface Earthquake {
 }
 
 interface WorldMapProps {
-  signals: Signal[];
+  signals?: Signal[];
   activeLayers: string[];
   onLayerToggle: (layer: string) => void;
   earthquakes?: Earthquake[];
+  financeMode?: boolean;
+  financeLayers?: string[];
+  height?: number;
 }
 
 const LAYERS = [
@@ -236,10 +239,13 @@ function calculateClusters(
 }
 
 export default function WorldMap({
-  signals,
+  signals = [],
   activeLayers,
   onLayerToggle,
   earthquakes = [],
+  financeMode = false,
+  financeLayers = [],
+  height,
 }: WorldMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);

@@ -1,0 +1,164 @@
+[
+  {
+    "name": "Antonio Ricaurte",
+    "operator": "ECOPETROL",
+    "from": "CO",
+    "to": "VE",
+    "capacity": 140,
+    "unit": "kb/d",
+    "status": "OFFLINE"
+  },
+  {
+    "name": "Arab Gas Pipeline",
+    "operator": "EGAS",
+    "from": "EG",
+    "to": "LB",
+    "capacity": 1000,
+    "unit": "MMSCFD",
+    "status": "OFFLINE"
+  },
+  {
+    "name": "Baku-Tbilisi-Ceyhan",
+    "operator": "BTC Co",
+    "from": "AZ",
+    "to": "TR",
+    "capacity": 1200,
+    "unit": "kb/d",
+    "status": "REDUCED"
+  },
+  {
+    "name": "Druzhba Pipeline",
+    "operator": "Transneft",
+    "from": "RU",
+    "to": "EU",
+    "capacity": 1000,
+    "unit": "kb/d",
+    "status": "REDUCED"
+  },
+  {
+    "name": "East-West Pipeline",
+    "operator": "Saudi Aramco",
+    "from": "SA",
+    "to": "SA",
+    "capacity": 5000,
+    "unit": "kb/d",
+    "status": "ONLINE"
+  },
+  {
+    "name": "ESPO Pipeline",
+    "operator": "Transneft",
+    "from": "RU",
+    "to": "CN",
+    "capacity": 1500,
+    "unit": "kb/d",
+    "status": "ONLINE"
+  },
+  {
+    "name": "GALSI Pipeline",
+    "operator": "GALSI",
+    "from": "DZ",
+    "to": "IT",
+    "capacity": 8000,
+    "unit": "MMSCFD",
+    "status": "OFFLINE"
+  },
+  {
+    "name": "Iran-Pakistan",
+    "operator": "NIGC",
+    "from": "IR",
+    "to": "PK",
+    "capacity": 750,
+    "unit": "MMSCFD",
+    "status": "OFFLINE"
+  },
+  {
+    "name": "Kashagan Oil",
+    "operator": "NCOC",
+    "from": "KZ",
+    "to": "KZ",
+    "capacity": 800,
+    "unit": "kb/d",
+    "status": "REDUCED"
+  },
+  {
+    "name": "Kirkuk-Ceyhan",
+    "operator": "SOMO",
+    "from": "IQ",
+    "to": "TR",
+    "capacity": 350,
+    "unit": "kb/d",
+    "status": "OFFLINE"
+  },
+  {
+    "name": "Magistral",
+    "operator": "Transneft",
+    "from": "RU",
+    "to": "BY",
+    "capacity": 800,
+    "unit": "kb/d",
+    "status": "REDUCED"
+  },
+  {
+    "name": "Nord Stream",
+    "operator": "Nord Stream AG",
+    "from": "RU",
+    "to": "DE",
+    "capacity": 55000,
+    "unit": "MMSCFD",
+    "status": "OFFLINE"
+  },
+  {
+    "name": "Power of Siberia",
+    "operator": "Gazprom",
+    "from": "RU",
+    "to": "CN",
+    "capacity": 38000,
+    "unit": "MMSCFD",
+    "status": "ONLINE"
+  },
+  {
+    "name": "Southern Gas Corridor",
+    "operator": "SGC",
+    "from": "AZ",
+    "to": "IT",
+    "capacity": 16000,
+    "unit": "MMSCFD",
+    "status": "ONLINE"
+  },
+  {
+    "name": "Trans-Anatolian",
+    "operator": "TANAP",
+    "from": "AZ",
+    "to": "TR",
+    "capacity": 16000,
+    "unit": "MMSCFD",
+    "status": "ONLINE"
+  },
+  {
+    "name": "Trans-Adriatic",
+    "operator": "TAP",
+    "from": "TR",
+    "to": "IT",
+    "capacity": 10000,
+    "unit": "MMSCFD",
+    "status": "ONLINE"
+  },
+  {
+    "name": "Trans-Mediterranean",
+    "operator": "Enag\u00e1s",
+    "from": "DZ",
+    "to": "IT",
+    "capacity": 12000,
+    "unit": "MMSCFD",
+    "status": "ONLINE"
+  },
+  {
+    "name": "Yamal-Europe",
+    "operator": "Gazprom",
+    "from": "RU",
+    "to": "PL",
+    "capacity": 32900,
+    "unit": "MMSCFD",
+    "status": "OFFLINE"
+  }
+]
