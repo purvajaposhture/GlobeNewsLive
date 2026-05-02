@@ -209,6 +209,18 @@ body {
   }
 }
 
+@keyframes loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
