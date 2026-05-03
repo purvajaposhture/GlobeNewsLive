@@ -56,7 +56,16 @@ import BreakingNewsBanner from '@/components/BreakingNewsBanner';
 import TVMode from '@/components/TVMode';
 import RSSTicker from '@/components/RSSTicker';
 import HelpPin from '@/components/HelpPin';
-import { Signal, MarketData, PredictionMarket, ThreatLevel } from '@/types';
+import PortStatusPanel from '@/components/PortStatusPanel';
+import GlobalSituationHeader from '@/components/GlobalSituationHeader';
+import TimeRangeSelector, { TimeRange } from '@/components/TimeRangeSelector';
+import RegionSelector, { Region } from '@/components/RegionSelector';
+import CategoryFilterBar from '@/components/CategoryFilterBar';
+import ActivityWaterfall from '@/components/ActivityWaterfall';
+import FeedPipelineMonitor from '@/components/FeedPipelineMonitor';
+import EnhancedMapControls from '@/components/EnhancedMapControls';
+import LiveNewsTicker from '@/components/LiveNewsTicker';
+import { Signal, MarketData, PredictionMarket, ThreatLevel, SignalCategory } from '@/types';
 import { getThreatLevelFromSignals } from '@/lib/classify';
 import { ACTIVE_CONFLICTS } from '@/lib/feeds';
 
@@ -64,6 +73,11 @@ import { ACTIVE_CONFLICTS } from '@/lib/feeds';
 const WarRoom = dynamic(() => import('@/components/WarRoom'), { 
   ssr: false,
   loading: () => <div className="h-screen flex items-center justify-center bg-void"><div className="text-accent-green animate-pulse font-mono">Loading War Room...</div></div>
+});
+
+const FinanceDashboardFull = dynamic(() => import('@/components/finance/FinanceDashboardFull'), {
+  ssr: false,
+  loading: () => <div className="h-screen flex items-center justify-center bg-void"><div className="text-accent-green animate-pulse font-mono">Loading Finance Dashboard...</div></div>
 });
 
 const fetcher = async (url: string) => {
@@ -92,7 +106,7 @@ function playAlertSound() {
   }
 }
 
-type ViewMode = 'dashboard' | 'warroom' | 'mapfocus';
+type ViewMode = 'dashboard' | 'warroom' | 'mapfocus' | 'finance';
 type MobileView = 'feed' | 'map' | 'markets' | 'tracking' | 'alerts';
 
 export default function Dashboard() {
@@ -101,7 +115,7 @@ export default function Dashboard() {
     'flights', 'routes', 'conflicts', 'military', 'chokepoints', 'earthquakes', 
     'nuclear', 'spaceports', 'iran', 'cables', 'pipelines', 
     'ai-centers', 'fires', 'gps-jamming', 'outages', 'cyber', 
-    'weather', 'displacement', 'clusters'
+    'weather', 'displacement', 'clusters', 'supplychain'
   ]);
   const { timeFilter, setTimeFilter, isLoaded: timeFilterLoaded } = usePersistentTimeFilter('24h');
   const [lastUpdate, setLastUpdate] = useState(new Date());
@@ -113,6 +127,13 @@ export default function Dashboard() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [tvMode, setTvMode] = useState(false);
   const [videoWallOpen, setVideoWallOpen] = useState(false);
+  
+  // New feature states
+  const [timeRange, setTimeRange] = useState<TimeRange>('24h');
+  const [activeRegion, setActiveRegion] = useState<Region>('global');
+  const [activeCategories, setActiveCategories] = useState<SignalCategory[]>([
+    'conflict', 'military', 'diplomacy', 'cyber', 'disaster', 'economy', 'politics', 'terrorism', 'protest', 'infrastructure'
+  ]);
   
   // Multi-language support
   const { language, changeLanguage, isRTL } = useLanguage();
@@ -195,6 +216,21 @@ export default function Dashboard() {
   }, [signalsData, marketsData, predictionsData]);
 
   const signals = signalsData?.signals || [];
+  
+  // Filter signals by time range
+  const now = new Date();
+  const timeRangeMs = {
+    '1h': 60 * 60 * 1000,
+    '6h': 6 * 60 * 60 * 1000,
+    '24h': 24 * 60 * 60 * 1000,
+    '48h': 48 * 60 * 60 * 1000,
+    '7d': 7 * 24 * 60 * 60 * 1000,
+  };
+  const filteredSignals = signals.filter(s => {
+    const cutoff = timeRangeMs[timeFilter as keyof typeof timeRangeMs] || timeRangeMs['24h'];
+    return new Date(s.timestamp).getTime() > now.getTime() - cutoff;
+  });
+  
   const markets = marketsData?.markets || [];
   const predictions = predictionsData?.predictions || [];
   const earthquakes = earthquakesData?.earthquakes || [];
@@ -221,6 +257,12 @@ export default function Dashboard() {
 
   const handleSignalClick = useCallback((signal: Signal) => {
     if (signal.sourceUrl) window.open(signal.sourceUrl, '_blank', 'noopener,noreferrer');
+  }, []);
+
+  const handleCategoryToggle = useCallback((category: SignalCategory) => {
+    setActiveCategories(prev =>
+      prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]
+    );
   }, []);
 
   // Skeleton loading - show immediate value while hydrating
@@ -394,6 +436,46 @@ export default function Dashboard() {
     );
   }
 
+  // Finance View
+  if (viewMode === 'finance') {
+    return (
+      <div className="h-screen flex flex-col bg-void">
+        {/* Mode Toggle */}
+        <div className="bg-void border-b border-border-default px-4 py-1.5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setViewMode('dashboard')}
+              className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
+            >
+              📊 DASHBOARD
+            </button>
+            <button
+              onClick={() => setViewMode('warroom')}
+              className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
+            >
+              ⚔️ WAR ROOM
+            </button>
+            <button
+              onClick={() => setViewMode('finance')}
+              className="px-3 py-1 rounded text-[10px] font-mono bg-accent-gold/20 text-accent-gold"
+            >
+              💰 FINANCE
+            </button>
+          </div>
+          <button
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded text-[9px] font-mono ${soundEnabled ? 'bg-accent-green/20 text-accent-green' : 'bg-elevated text-text-dim'}`}
+          >
+            {soundEnabled ? '🔔' : '🔕'} ALERTS
+          </button>
+        </div>
+        <div className="flex-1 overflow-hidden">
+          <FinanceDashboardFull />
+        </div>
+      </div>
+    );
+  }
+
   // Dashboard View
   return (
     <div className={`h-screen flex flex-col bg-void overflow-hidden ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
@@ -401,7 +483,7 @@ export default function Dashboard() {
       <CommandPalette
         isOpen={commandPaletteOpen}
         onClose={() => setCommandPaletteOpen(false)}
-        signals={signals.map(s => ({ title: s.title, country: undefined, severity: s.severity }))}
+        signals={filteredSignals.map(s => ({ title: s.title, country: undefined, severity: s.severity }))}
         onNavigate={(view) => { if (view === 'warroom') setViewMode('warroom'); else setViewMode('dashboard'); }}
         onToggleLayer={handleLayerToggle}
       />
@@ -413,7 +495,7 @@ export default function Dashboard() {
       <CustomVideoWall isOpen={videoWallOpen} onClose={() => setVideoWallOpen(false)} />
 
       {/* Breaking News Banner */}
-      <BreakingNewsBanner signals={signals} notificationLevel={notificationLevel} />
+      <BreakingNewsBanner signals={filteredSignals} notificationLevel={notificationLevel} />
 
       {/* Mode Toggle - Desktop */}
       <div className="hidden lg:flex bg-void border-b border-border-default px-4 py-1.5 items-center justify-between">
@@ -448,6 +530,12 @@ export default function Dashboard() {
           >
             🗺️ MAP FOCUS
           </button>
+          <button
+            onClick={() => setViewMode('finance')}
+            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white hover:bg-white/5"
+          >
+            💰 FINANCE
+          </button>
         </div>
         <div className="flex items-center gap-3">
           <KeyboardShortcutsHelp />
@@ -466,8 +554,8 @@ export default function Dashboard() {
             <span>⌘K</span>
             <span className="hidden xl:inline">Search</span>
           </button>
-          <SearchBar signals={signals} />
-          <span className="text-[9px] text-text-dim font-mono hidden xl:inline">{signals.length} signals</span>
+          <SearchBar signals={filteredSignals} />
+          <span className="text-[9px] text-text-dim font-mono hidden xl:inline">{filteredSignals.length} / {signals.length} signals</span>
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
             className={`flex items-center gap-1.5 px-2 py-1 rounded text-[9px] font-mono ${soundEnabled ? 'bg-accent-green/20 text-accent-green' : 'bg-elevated text-text-dim'}`}
@@ -496,29 +584,79 @@ export default function Dashboard() {
         onThemeToggle={toggleTheme}
       />
 
-      {/* Desktop Layout — WorldMonitor-style with sidebar */}
+      {/* NEW: Global Situation Header */}
+      <GlobalSituationHeader 
+        threatLevel={threatLevel} 
+        signals={signals} 
+        activeConflicts={ACTIVE_CONFLICTS.length} 
+        lastUpdate={lastUpdate} 
+      />
+
+      {/* NEW: Control Bars */}
+      <div className="hidden lg:flex items-center gap-2 px-4 py-1.5 bg-void border-b border-border-default overflow-x-auto">
+        <TimeRangeSelector value={timeRange} onChange={setTimeRange} />
+        <RegionSelector value={activeRegion} onChange={setActiveRegion} />
+        <div className="flex-1 min-w-0">
+          <CategoryFilterBar active={activeCategories} onToggle={handleCategoryToggle} />
+        </div>
+      </div>
+
+      {/* Desktop Layout — WorldMonitor-style with sidebar + PR24 enhancements */}
       <div className="hidden lg:flex flex-1 overflow-hidden">
         <WorldMonitorLayout signals={signals} activeLayers={activeLayers} onLayerToggle={handleLayerToggle} defcon={3} criticalCount={criticalCount}>
-        <CustomDashboard
-          signals={signals}
-          markets={markets}
-          earthquakes={earthquakes}
-          conflicts={conflicts}
-          signalsLoading={signalsLoading || signalsValidating}
-          marketsLoading={marketsLoading || marketsValidating}
-          activeLayers={activeLayers}
-          onLayerToggle={handleLayerToggle}
-          onSignalClick={handleSignalClick}
-          isBookmarked={isBookmarked}
-          onBookmark={toggleBookmark}
-        />
+          <CustomDashboard
+            signals={filteredSignals}
+            markets={markets}
+            earthquakes={earthquakes}
+            conflicts={conflicts}
+            signalsLoading={signalsLoading || signalsValidating}
+            marketsLoading={marketsLoading || marketsValidating}
+            activeLayers={activeLayers}
+            onLayerToggle={handleLayerToggle}
+            onSignalClick={handleSignalClick}
+            isBookmarked={isBookmarked}
+            onBookmark={toggleBookmark}
+          />
         </WorldMonitorLayout>
+        {/* NEW: Right Sidebar Widgets */}
+        <aside className="w-[280px] border-l border-border-default bg-void overflow-y-auto p-2 space-y-2 hidden xl:block">
+          <ActivityWaterfall signals={filteredSignals} maxItems={12} />
+          <FeedPipelineMonitor />
+        </aside>
+      </div>
+
+      {/* NEW: Floating Map Controls (Desktop overlay) */}
+      <div className="hidden lg:block absolute top-[140px] right-[300px] z-10">
+        <EnhancedMapControls activeLayers={activeLayers} onLayerToggle={handleLayerToggle} />
       </div>
 
       {/* Mobile Layout */}
       <main className="lg:hidden flex-1 overflow-hidden pb-20">
-        {mobileView === 'feed' && <SignalFeed signals={signals} loading={signalsLoading || signalsValidating} onSignalClick={handleSignalClick} />}
-        {mobileView === 'map' && <div className="h-full p-2"><WorldMap signals={signals} activeLayers={activeLayers} onLayerToggle={handleLayerToggle} earthquakes={earthquakes} /></div>}
+        {/* Mobile time filter bar */}
+        <div className="flex items-center gap-1 px-2 py-1.5 bg-elevated border-b border-border-default overflow-x-auto">
+          <span className="text-[9px] text-text-dim font-mono shrink-0">TIME:</span>
+          {['1h', '6h', '24h', '48h', '7d'].map(filter => (
+            <button
+              key={filter}
+              onClick={() => setTimeFilter(filter)}
+              className={`px-2 py-0.5 rounded text-[9px] font-mono shrink-0 transition-all ${
+                timeFilter === filter
+                  ? 'bg-accent-green/20 text-accent-green'
+                  : 'text-text-dim hover:text-text-muted'
+              }`}
+            >
+              {filter}
+            </button>
+          ))}
+          <span className="text-[9px] text-text-dim font-mono ml-auto shrink-0">{filteredSignals.length}/{signals.length}</span>
+        </div>
+        {mobileView === 'feed' && <SignalFeed signals={filteredSignals} loading={signalsLoading || signalsValidating} onSignalClick={handleSignalClick} />}
+        {mobileView === 'map' && (
+          <div className="h-full p-2 relative">
+            <WorldMap signals={filteredSignals} activeLayers={activeLayers} onLayerToggle={handleLayerToggle} earthquakes={earthquakes} />
+            <EnhancedMapControls activeLayers={activeLayers} onLayerToggle={handleLayerToggle} />
+          </div>
+        )}
         {mobileView === 'markets' && (
           <div className="h-full overflow-y-auto p-2 space-y-2">
             <SituationBrief />
@@ -533,6 +671,7 @@ export default function Dashboard() {
             <MilitaryTracker />
             <FlightTracker />
             <TrackingPanel earthquakes={earthquakes} />
+            <PortStatusPanel />
             <TwitterFeed />
             <div className="glass-panel">
               <div className="px-3 py-2 border-b border-border-subtle bg-panel/50">
@@ -606,6 +745,9 @@ export default function Dashboard() {
       </div>
       {/* Help Pin - Floating help button */}
       <HelpPin />
+
+      {/* NEW: Live News Ticker */}
+      <LiveNewsTicker signals={signals} />
     </div>
   );
 }

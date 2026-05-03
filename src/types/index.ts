@@ -69,24 +69,24 @@ export type ThreatLevel = 'LOW' | 'GUARDED' | 'ELEVATED' | 'HIGH' | 'SEVERE';
 
 export interface MissileEvent {
   id: string;
-  type: 'DRONE' | 'AIRSTRIKE' | 'ARTILLERY' | 'SRBM' | 'CRUISE' | 'ICBM' | 'HYPERSONIC';
-  source: 'ACLED' | 'GDELT' | 'SYNTHETIC' | 'OSINT';
+  type: 'DRONE' | 'AIRSTRIKE' | 'ARTILLERY' | 'SRBM' | 'CRUISE' | 'MISSILE' | 'ROCKET' | 'INTERCEPTION' | 'ICBM' | 'MRBM' | 'MLRS';
+  source: 'ACLED' | 'GDELT' | 'SYNTHETIC';
+  origin: [number, number];
+  target: [number, number];
   lat: number;
   lon: number;
+  timestamp: string;
+  location: string;
+  label: string;
+  description: string;
+  severity: Severity;
   region: string;
-  timestamp: Date;
-  speed?: number;
-  altitude?: number;
+  speed?: number | string;
+  altitude?: number | string;
   warhead?: string;
-  status?: 'ACTIVE' | 'INTERCEPTED' | 'IMPACT' | 'LOST';
-  confidence: number;
-}
-
-export interface DashboardState {
-  threatLevel: ThreatLevel;
-  activeConflicts: number;
-  militaryAlerts: number;
-  lastUpdate: Date;
-  timeFilter: '1h' | '6h' | '24h' | '48h' | '7d';
-  activeLayers: string[];
+  status?: 'IN_FLIGHT' | 'IMPACTED' | 'INTERCEPTED' | 'UNKNOWN' | 'intercepted' | 'active';
+  targetName?: string;
+  country?: string;
+  confidence?: number;
+  fatalities?: number;
 }
