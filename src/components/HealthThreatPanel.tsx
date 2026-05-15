@@ -120,14 +120,14 @@ export default function HealthThreatPanel() {
   };
 
   // Aggregate stats — derive from ALL outbreaks (same source as sidebar counts)
-  const confirmedCases = outbreaks
+  const confirmedCases = filtered
     .filter(o => o.signal_type === 'confirmed_case')
-    .reduce((sum, o) => sum + (o.case_count || 1), 0);  // fallback to 1 if case_count null
+    .reduce((sum, o) => sum + (o.case_count || 1), 0);
   const deaths = 3;  // from MV Hondius summary
-  const monitored = outbreaks
+  const monitored = filtered
     .filter(o => o.signal_type === 'monitoring')
     .reduce((sum, o) => sum + (o.monitoring_count || 0), 0);
-  const probableCases = outbreaks
+  const probableCases = filtered
     .filter(o => o.signal_type === 'monitoring' && o.case_count && o.case_count > 0)
     .reduce((sum, o) => sum + (o.case_count || 0), 0);
 

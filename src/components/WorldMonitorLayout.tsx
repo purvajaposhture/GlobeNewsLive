@@ -17,8 +17,6 @@ interface WorldMonitorLayoutProps {
   signals: Signal[];
   activeLayers: string[];
   onLayerToggle: (layer: string) => void;
-  defcon?: number;
-  criticalCount?: number;
 }
 
 const SIDEBAR_LAYERS: LayerConfig[] = [
@@ -44,9 +42,8 @@ const REGION_PRESETS = [
   { id: 'americas', label: 'Americas', icon: '🌎' },
 ];
 
-function WorldMonitorLayoutInner({ children, signals, activeLayers, onLayerToggle, defcon = 3, criticalCount = 0 }: WorldMonitorLayoutProps) {
+function WorldMonitorLayoutInner({ children, signals, activeLayers, onLayerToggle }: WorldMonitorLayoutProps) {
   const [layers, setLayers] = useState<LayerConfig[]>(SIDEBAR_LAYERS);
-  const [region, setRegion] = useState('global');
   const { mapView: view, setMapView: setView } = useMapView();
 
   const toggleLayer = (id: string) => {
@@ -58,40 +55,7 @@ function WorldMonitorLayoutInner({ children, signals, activeLayers, onLayerToggl
 
   return (
     <div className="flex flex-col h-full w-full bg-void overflow-hidden">
-      {/* WorldMonitor-style sub-nav */}
-      <div className="flex items-center justify-between px-3 py-1.5 bg-black/40 border-b border-white/[0.06] backdrop-blur-sm z-20">
-        {/* Left: region presets only (layers tab removed per #43) */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            {REGION_PRESETS.map(r => (
-              <button key={r.id} onClick={() => setRegion(r.id)}
-                className={`flex items-center gap-1 px-2 py-1 rounded text-[8px] font-mono transition-all ${region === r.id ? 'bg-white/10 text-white border border-white/20' : 'text-text-dim hover:text-white'}`}>
-                <span>{r.icon}</span>
-                <span className="hidden md:inline">{r.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Right: 2D/3D toggle + signal count */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-black/30 rounded border border-white/10 p-0.5">
-            {(['2D', '3D'] as const).map(v => (
-              <button key={v} onClick={() => setView(v)}
-                className={`px-2 py-0.5 rounded text-[9px] font-mono transition-all ${view === v ? 'bg-white/15 text-white' : 'text-text-dim hover:text-white'}`}>
-                {v}
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-accent-green/5 border border-accent-green/20">
-            <div className="w-1.5 h-1.5 bg-accent-green rounded-full animate-pulse" />
-            <span className="text-[9px] font-mono text-accent-green">LIVE</span>
-            <span className="text-[9px] font-mono text-white/50">{signals.length}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Main content area — sidebar removed per #43 */}
+      {/* Main content area — sub-nav removed per issue #44 */}
       <div className="flex flex-1 overflow-hidden">
         {/* Main dashboard content */}
         <div className="flex-1 overflow-hidden">

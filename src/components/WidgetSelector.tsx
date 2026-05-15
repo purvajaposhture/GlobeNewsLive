@@ -210,13 +210,6 @@ export const WIDGET_REGISTRY: Omit<WidgetConfig, 'visible'>[] = [
     defaultSize: { w: 3, h: 8 },
   },
   {
-    id: 'strategic-posture',
-    name: 'Strategic Posture',
-    icon: '🎯',
-    description: 'Military readiness levels — DEFCON-style indicators by country',
-    defaultSize: { w: 3, h: 10 },
-  },
-  {
     id: 'ucdp-events',
     name: 'UCDP Events',
     icon: '📊',

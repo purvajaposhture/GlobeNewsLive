@@ -117,7 +117,6 @@ import TelegramFeed from "./TelegramFeed";
 import PlaybackControl from "./PlaybackControl";
 import CIIPanel from "./CIIPanel";
 import OrefSirensPanel from "./OrefSirensPanel";
-import StrategicPosturePanel from "./StrategicPosturePanel";
 import UcdpEventsPanel from "./UcdpEventsPanel";
 import WorldClockPanel from "./WorldClockPanel";
 import SecurityAdvisoriesPanel from "./SecurityAdvisoriesPanel";
@@ -446,7 +445,6 @@ const LAYOUT_PRESETS: Record<
       "hotspot-streams",
       "cii-panel",
       "oref-sirens",
-      "strategic-posture",
       "ucdp-events",
       "world-clock",
       "security-advisories",
@@ -484,8 +482,8 @@ const LAYOUT_PRESETS: Record<
         maxW: 1,
         minH: 6,
       },
-      { i: "oref-sirens", x: 1, y: 14, w: 1, h: 8, minW: 1, maxW: 1, minH: 6 },
-      { i: "ucdp-events", x: 0, y: 20, w: 1, h: 8, minW: 1, maxW: 1, minH: 6 },
+      { i: "oref-sirens", x: 1, y: 6, w: 1, h: 8, minW: 1, maxW: 1, minH: 6 },
+      { i: "ucdp-events", x: 0, y: 12, w: 1, h: 8, minW: 1, maxW: 1, minH: 6 },
       { i: "gdelt-intel", x: 1, y: 22, w: 1, h: 8, minW: 1, maxW: 1, minH: 6 },
       {
         i: "macro-signals",
@@ -605,6 +603,14 @@ export default function CustomDashboard({
   const [showPresetsMenu, setShowPresetsMenu] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showSavedMenu, setShowSavedMenu] = useState(false);
+  const [toolbarCollapsed, setToolbarCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      // Default to collapsed (true) per issue #44 — persist user preference
+      const saved = localStorage.getItem('globenews_toolbar_collapsed');
+      return saved === null ? true : saved === 'true';
+    }
+    return true;
+  });
   const [saveLayoutName, setSaveLayoutName] = useState("");
   const [isMounted, setIsMounted] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -870,8 +876,7 @@ export default function CustomDashboard({
         return <CIIPanel />;
       case "oref-sirens":
         return <OrefSirensPanel />;
-      case "strategic-posture":
-        return <StrategicPosturePanel />;
+
       case "ucdp-events":
         return <UcdpEventsPanel />;
       case "world-clock":
@@ -1012,17 +1017,18 @@ export default function CustomDashboard({
 
         {/* ── MAIN CONTENT AREA ─────────────────────────────── */}
         <div className="flex-1 flex flex-col h-full overflow-hidden">
-          {/* Toolbar */}
-          <div
-            className="flex items-center gap-2 px-4 py-2 border-b flex-shrink-0 z-20"
-            style={{
-              background: settings.theme === "light" ? "#e8ecf0" : "#0a0a0f",
-              borderColor:
-                settings.theme === "light"
-                  ? "rgba(0,0,0,0.1)"
-                  : "rgba(255,255,255,0.08)",
-            }}
-          >
+          {/* Toolbar — collapsible, persists state */}
+          {!toolbarCollapsed && (
+            <div
+              className="flex items-center gap-2 px-4 py-2 border-b flex-shrink-0 z-20"
+              style={{
+                background: settings.theme === "light" ? "#e8ecf0" : "#0a0a0f",
+                borderColor:
+                  settings.theme === "light"
+                    ? "rgba(0,0,0,0.1)"
+                    : "rgba(255,255,255,0.08)",
+              }}
+            >
             {/* Layout Presets Dropdown */}
             <div className="relative" ref={presetsRef}>
               <button
@@ -1270,7 +1276,26 @@ export default function CustomDashboard({
               <Settings size={11} />
               <span className="hidden sm:inline">Settings</span>
             </button>
+
+            {/* Collapse toggle */}
+            <button
+              onClick={() => {
+                const next = !toolbarCollapsed;
+                setToolbarCollapsed(next);
+                localStorage.setItem('globenews_toolbar_collapsed', String(next));
+              }}
+              className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-mono border transition-all"
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                borderColor: "rgba(255,255,255,0.08)",
+                color: "rgba(255,255,255,0.35)",
+              }}
+              title={toolbarCollapsed ? "Expand toolbar" : "Collapse toolbar"}
+            >
+              {toolbarCollapsed ? '▼' : '▲'}
+            </button>
           </div>
+          )}
 
           {/* ── Responsive Grid Layout ──────────────────────────────────────────────────── */}
           <div className="flex-1 overflow-y-auto custom-scrollbar-wide">

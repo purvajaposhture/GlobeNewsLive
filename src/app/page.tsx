@@ -102,7 +102,7 @@ function playAlertSound() {
   }
 }
 
-type ViewMode = 'dashboard' | 'warroom' | 'mapfocus' | 'finance' | 'economic' | 'health';
+type ViewMode = 'dashboard' | 'warroom' | 'mapfocus' | 'finance' | 'health';
 type MobileView = 'feed' | 'map' | 'markets' | 'tracking' | 'alerts' | 'economic';
 
 export default function Dashboard() {
@@ -395,19 +395,21 @@ export default function Dashboard() {
               🦠 HEALTH
             </button>
           </div>
-          <button
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`flex items-center gap-1.5 px-2 py-1 rounded text-[9px] font-mono ${soundEnabled ? 'bg-accent-green/20 text-accent-green' : 'bg-elevated text-text-dim'}`}
-          >
-            {soundEnabled ? '🔔' : '🔕'} ALERTS
-          </button>
-          <button
-            onClick={() => setNotificationLevel(notificationLevel === 'critical' ? 'all' : 'critical')}
-            className={`flex items-center gap-1.5 px-2 py-1 rounded text-[9px] font-mono ${notificationLevel === 'all' ? 'bg-accent-blue/20 text-accent-blue' : 'bg-elevated text-text-dim'}`}
-            title={notificationLevel === 'critical' ? 'Only Critical notifications' : 'All updates notifications'}
-          >
-            {notificationLevel === 'critical' ? '🔴' : '🔵'} {notificationLevel === 'critical' ? 'CRIT' : 'ALL'}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className={`flex items-center gap-1.5 px-2 py-1 rounded text-[9px] font-mono ${soundEnabled ? 'bg-accent-green/20 text-accent-green' : 'bg-elevated text-text-dim'}`}
+            >
+              {soundEnabled ? '🔔' : '🔕'} ALERTS
+            </button>
+            <button
+              onClick={() => setNotificationLevel(notificationLevel === 'critical' ? 'all' : 'critical')}
+              className={`flex items-center gap-1.5 px-2 py-1 rounded text-[9px] font-mono ${notificationLevel === 'all' ? 'bg-accent-blue/20 text-accent-blue' : 'bg-elevated text-text-dim'}`}
+              title={notificationLevel === 'critical' ? 'Only Critical notifications' : 'All updates notifications'}
+            >
+              {notificationLevel === 'critical' ? '🔴' : '🔵'} {notificationLevel === 'critical' ? 'CRIT' : 'ALL'}
+            </button>
+          </div>
         </div>
         <div className="flex-1 overflow-hidden">
           <WarRoom signals={signals} conflicts={conflicts} />
@@ -461,12 +463,6 @@ export default function Dashboard() {
               💰 FINANCE
             </button>
             <button
-              onClick={() => setViewMode('economic')}
-              className="px-3 py-1 rounded text-[10px] font-mono bg-[#378ADD]/20 text-[#378ADD]"
-            >
-              🏛️ ECONOMIC
-            </button>
-            <button
               onClick={() => setViewMode('health')}
               className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
             >
@@ -512,12 +508,6 @@ export default function Dashboard() {
             >
               💰 FINANCE
             </button>
-            <button
-              onClick={() => setViewMode('economic')}
-              className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
-            >
-              📈 ECONOMIC
-            </button>
             <span className="px-3 py-1 rounded text-[10px] font-mono text-accent-green bg-accent-green/10">
               🦠 HEALTH
             </span>
@@ -526,58 +516,6 @@ export default function Dashboard() {
         </div>
         <div className="flex-1 overflow-hidden">
           <HealthThreatPanel />
-        </div>
-      </div>
-    );
-  }
-
-  // Economic View
-  if (viewMode === 'economic') {
-    return (
-      <div className="h-screen flex flex-col bg-void">
-        {/* Mode Toggle */}
-        <div className="bg-void border-b border-border-default px-4 py-1.5 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setViewMode('dashboard')}
-              className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
-            >
-              📊 DASHBOARD
-            </button>
-            <button
-              onClick={() => setViewMode('warroom')}
-              className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
-            >
-              ⚔️ WAR ROOM
-            </button>
-            <button
-              onClick={() => setViewMode('finance')}
-              className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
-            >
-              💰 FINANCE
-            </button>
-            <button
-              onClick={() => setViewMode('economic')}
-              className="px-3 py-1 rounded text-[10px] font-mono bg-[#378ADD]/20 text-[#378ADD]"
-            >
-              🏛️ ECONOMIC
-            </button>
-            <button
-              onClick={() => setViewMode('health')}
-              className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
-            >
-              🦠 HEALTH
-            </button>
-          </div>
-          <button
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`flex items-center gap-1.5 px-2 py-1 rounded text-[9px] font-mono ${soundEnabled ? 'bg-accent-green/20 text-accent-green' : 'bg-elevated text-text-dim'}`}
-          >
-            {soundEnabled ? '🔔' : '🔕'} ALERTS
-          </button>
-        </div>
-        <div className="flex-1 overflow-hidden">
-          <EconomicDashboardFull />
         </div>
       </div>
     );
@@ -604,54 +542,36 @@ export default function Dashboard() {
       {/* Breaking News Banner */}
       <BreakingNewsBanner signals={filteredSignals} notificationLevel={notificationLevel} />
 
-      {/* Mode Toggle - Desktop */}
+      {/* Mode Toggle - Desktop — streamlined per issue #44 */}
       <div className="hidden lg:flex bg-void border-b border-border-default px-4 py-1.5 items-center justify-between">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setViewMode('dashboard')}
-            className="px-3 py-1 rounded text-[10px] font-mono bg-accent-green/20 text-accent-green"
+            className={`px-3 py-1 rounded text-[10px] font-mono ${viewMode === 'dashboard' ? 'bg-accent-green/20 text-accent-green' : 'text-text-dim hover:text-white hover:bg-white/5'}`}
           >
             📊 DASHBOARD
           </button>
           <button
             onClick={() => setViewMode('warroom')}
-            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white hover:bg-white/5"
+            className="px-3 py-1 rounded text-[10px] font-mono bg-accent-red/20 text-accent-red"
           >
             ⚔️ WAR ROOM
           </button>
           <button
-            onClick={() => setTvMode(true)}
-            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white hover:bg-white/5"
-          >
-            📺 TV MODE
-          </button>
-          <button
-            onClick={() => setVideoWallOpen(true)}
-            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white hover:bg-white/5"
-          >
-            🎬 VIDEO WALL
-          </button>
-          <button
             onClick={() => setViewMode('mapfocus')}
-            className='px-3 py-1 rounded text-[10px] font-mono text-accent-blue bg-accent-blue/10 hover:bg-accent-blue/20 transition-all'
+            className="px-3 py-1 rounded text-[10px] font-mono bg-accent-blue/20 text-accent-blue"
           >
             🗺️ MAP FOCUS
           </button>
           <button
             onClick={() => setViewMode('finance')}
-            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white hover:bg-white/5"
+            className="px-3 py-1 rounded text-[10px] font-mono bg-accent-gold/20 text-accent-gold"
           >
             💰 FINANCE
           </button>
           <button
-            onClick={() => setViewMode('economic')}
-            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white hover:bg-white/5"
-          >
-            🏛️ ECONOMIC
-          </button>
-          <button
             onClick={() => setViewMode('health')}
-            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white hover:bg-white/5"
+            className="px-3 py-1 rounded text-[10px] font-mono bg-accent-purple/20 text-accent-purple"
           >
             🦠 HEALTH
           </button>
@@ -668,10 +588,6 @@ export default function Dashboard() {
         lastUpdate={lastUpdate}
         signalCount={signals.length}
         criticalCount={criticalCount}
-        language={language}
-        onLanguageChange={changeLanguage}
-        isDark={isDark}
-        onThemeToggle={toggleTheme}
       />
 
       {/* NEW: Global Situation Header */}
@@ -686,7 +602,7 @@ export default function Dashboard() {
 
       {/* Desktop Layout — WorldMonitor-style with sidebar + PR24 enhancements */}
       <div className="hidden lg:flex flex-1 overflow-hidden">
-        <WorldMonitorLayout signals={signals} activeLayers={activeLayers} onLayerToggle={handleLayerToggle} defcon={3} criticalCount={criticalCount}>
+        <WorldMonitorLayout signals={signals} activeLayers={activeLayers} onLayerToggle={handleLayerToggle}>
           <CustomDashboard
             signals={filteredSignals}
             markets={markets}
@@ -821,13 +737,160 @@ export default function Dashboard() {
 
       {/* RSS News Ticker - Desktop */}
       <div className="hidden lg:block">
-        <StatsBar activeConflicts={ACTIVE_CONFLICTS.length} militaryAlerts={militaryCount} highSeverity={highCount} criticalSeverity={criticalCount} timeFilter={timeFilter} onTimeFilterChange={setTimeFilter} />
+        <StatsBar activeConflicts={ACTIVE_CONFLICTS.length} militaryAlerts={militaryCount} highSeverity={highCount} criticalSeverity={criticalCount} />
       </div>
       {/* Help Pin - Floating help button */}
       <HelpPin />
 
       {/* NEW: Live News Ticker */}
       <LiveNewsTicker signals={signals} />
+    </div>
+  );
+}
+
+// War Room View
+function WarRoomView({ signals, conflicts, setViewMode, setSoundEnabled, soundEnabled, notificationLevel, setNotificationLevel }: {
+  signals: Signal[];
+  conflicts: any[];
+  setViewMode: (v: ViewMode) => void;
+  setSoundEnabled: (v: boolean) => void;
+  soundEnabled: boolean;
+  notificationLevel: 'all' | 'critical';
+  setNotificationLevel: (v: 'all' | 'critical') => void;
+}) {
+  return (
+    <div className="h-screen flex flex-col bg-void">
+      {/* Mode Toggle */}
+      <div className="bg-void border-b border-border-default px-4 py-1.5 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setViewMode('dashboard')}
+            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
+          >
+            📊 DASHBOARD
+          </button>
+          <button
+            onClick={() => setViewMode('warroom')}
+            className="px-3 py-1 rounded text-[10px] font-mono bg-accent-red/20 text-accent-red"
+          >
+            ⚔️ WAR ROOM
+          </button>
+          <button
+            onClick={() => setViewMode('health')}
+            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
+          >
+            🦠 HEALTH
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded text-[9px] font-mono ${soundEnabled ? 'bg-accent-green/20 text-accent-green' : 'bg-elevated text-text-dim'}`}
+          >
+            {soundEnabled ? '🔔' : '🔕'} ALERTS
+          </button>
+          <button
+            onClick={() => setNotificationLevel(notificationLevel === 'critical' ? 'all' : 'critical')}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded text-[9px] font-mono ${notificationLevel === 'all' ? 'bg-accent-blue/20 text-accent-blue' : 'bg-elevated text-text-dim'}`}
+            title={notificationLevel === 'critical' ? 'Only Critical notifications' : 'All updates notifications'}
+          >
+            {notificationLevel === 'critical' ? '🔴' : '🔵'} {notificationLevel === 'critical' ? 'CRIT' : 'ALL'}
+          </button>
+        </div>
+      </div>
+      <div className="flex-1 overflow-hidden">
+        <WarRoom signals={signals} conflicts={conflicts} />
+      </div>
+    </div>
+  );
+}
+
+// Finance View
+function FinanceView({ setViewMode, setSoundEnabled, soundEnabled }: {
+  setViewMode: (v: ViewMode) => void;
+  setSoundEnabled: (v: boolean) => void;
+  soundEnabled: boolean;
+}) {
+  return (
+    <div className="h-screen flex flex-col bg-void">
+      {/* Mode Toggle */}
+      <div className="bg-void border-b border-border-default px-4 py-1.5 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setViewMode('dashboard')}
+            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
+          >
+            📊 DASHBOARD
+          </button>
+          <button
+            onClick={() => setViewMode('warroom')}
+            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
+          >
+            ⚔️ WAR ROOM
+          </button>
+          <button
+            onClick={() => setViewMode('finance')}
+            className="px-3 py-1 rounded text-[10px] font-mono bg-accent-gold/20 text-accent-gold"
+          >
+            💰 FINANCE
+          </button>
+          <button
+            onClick={() => setViewMode('health')}
+            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
+          >
+            🦠 HEALTH
+          </button>
+        </div>
+        <button
+          onClick={() => setSoundEnabled(!soundEnabled)}
+          className={`flex items-center gap-1.5 px-2 py-1 rounded text-[9px] font-mono ${soundEnabled ? 'bg-accent-green/20 text-accent-green' : 'bg-elevated text-text-dim'}`}
+        >
+          {soundEnabled ? '🔔' : '🔕'} ALERTS
+        </button>
+      </div>
+      <div className="flex-1 overflow-hidden">
+        <FinanceDashboardFull />
+      </div>
+    </div>
+  );
+}
+
+// Health Threat View
+function HealthView({ setViewMode }: {
+  setViewMode: (v: ViewMode) => void;
+}) {
+  return (
+    <div className="h-screen flex flex-col bg-void">
+      {/* Mode Toggle */}
+      <div className="bg-void border-b border-border-default px-4 py-1.5 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setViewMode('dashboard')}
+            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
+          >
+            📊 DASHBOARD
+          </button>
+          <button
+            onClick={() => setViewMode('warroom')}
+            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
+          >
+            ⚔️ WAR ROOM
+          </button>
+          <button
+            onClick={() => setViewMode('finance')}
+            className="px-3 py-1 rounded text-[10px] font-mono text-text-dim hover:text-white"
+          >
+            💰 FINANCE
+          </button>
+          <span className="px-3 py-1 rounded text-[10px] font-mono text-accent-green bg-accent-green/10">
+            🦠 HEALTH
+          </span>
+        </div>
+        <FullscreenToggle />
+      </div>
+      <div className="flex-1 overflow-hidden">
+        <HealthThreatPanel />
+      </div>
     </div>
   );
 }

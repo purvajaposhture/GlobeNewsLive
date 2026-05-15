@@ -1,11 +1,8 @@
 'use client';
-import RefreshCountdown from '@/components/RefreshCountdown';
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ThreatLevel } from '@/types';
-import LanguageSelector from './LanguageSelector';
-import { Language, t } from '@/lib/i18n';
 
 // ─── Theme Toggle Hook ────────────────────────────────────────────────────────
 export function useTheme() {
@@ -37,22 +34,6 @@ export function useTheme() {
   return { isDark, toggle };
 }
 
-// ─── Theme Toggle Button ──────────────────────────────────────────────────────
-export function ThemeToggle({ isDark, onToggle }: { isDark: boolean; onToggle: () => void }) {
-  return (
-    <button
-      onClick={onToggle}
-      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-white/10 hover:border-white/25 bg-white/5 hover:bg-white/10 transition-all"
-      title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-    >
-      <span className="text-sm">{isDark ? '☀️' : '🌙'}</span>
-      <span className="text-[9px] font-mono text-white/50 hidden sm:block">
-        {isDark ? 'LIGHT' : 'DARK'}
-      </span>
-    </button>
-  );
-}
-
 const THREAT_COLORS: Record<ThreatLevel, string> = {
   LOW: '#00ff88',
   GUARDED: '#00ccff',
@@ -67,13 +48,9 @@ interface HeaderProps {
   lastUpdate: Date;
   signalCount: number;
   criticalCount: number;
-  language?: Language;
-  onLanguageChange?: (lang: Language) => void;
-  isDark?: boolean;
-  onThemeToggle?: () => void;
 }
 
-export default function Header({ threatLevel, breakingNews, lastUpdate, signalCount, criticalCount, language = 'en', onLanguageChange, isDark = true, onThemeToggle }: HeaderProps) {
+export default function Header({ threatLevel, breakingNews, lastUpdate, signalCount, criticalCount }: HeaderProps) {
   const [time, setTime] = useState(new Date());
   const [showBreaking, setShowBreaking] = useState(true);
   const [updateAgo, setUpdateAgo] = useState(0);
@@ -129,14 +106,7 @@ export default function Header({ threatLevel, breakingNews, lastUpdate, signalCo
             </div>
           </Link>
           
-          {/* Pro Link */}
-          <Link 
-            href="/pro" 
-            className="ml-4 px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-[10px] font-mono text-blue-400 hover:text-blue-300 transition flex items-center gap-1.5"
-          >
-            <span>⚡</span>
-            <span>PRO</span>
-          </Link>
+
         </div>
         
         {/* Threat Level */}
@@ -163,21 +133,8 @@ export default function Header({ threatLevel, breakingNews, lastUpdate, signalCo
           )}
         </div>
         
-        {/* Time + Language */}
+        {/* Time + Status */}
         <div className="flex items-center gap-4">
-          {/* Theme Toggle */}
-          {onThemeToggle && (
-            <ThemeToggle isDark={isDark} onToggle={onThemeToggle} />
-          )}
-
-          {/* Language Selector */}
-          {onLanguageChange && (
-            <LanguageSelector 
-              currentLang={language} 
-              onLanguageChange={onLanguageChange}
-            />
-          )}
-          
           <div className="text-right">
             <div className="font-mono text-lg text-white tracking-wide">{utcTime}</div>
             <div className="font-mono text-[9px] text-text-muted">UTC</div>
@@ -188,7 +145,6 @@ export default function Header({ threatLevel, breakingNews, lastUpdate, signalCo
               <span className="font-mono text-[11px] text-white">{updateAgo < 60 ? 'LIVE' : 'SYNCING'}</span>
             </div>
             <div className="font-mono text-[9px] text-text-dim">{updateAgo < 60 ? `${updateAgo}s` : `${Math.floor(updateAgo / 60)}m`} ago</div>
-            <RefreshCountdown intervalMs={30000} lastUpdate={lastUpdate} onRefresh={() => {}} />
           </div>
         </div>
       </div>
